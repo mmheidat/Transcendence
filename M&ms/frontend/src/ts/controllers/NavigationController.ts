@@ -1,6 +1,6 @@
 // Navigation controller for section switching and browser history
 
-export type SectionType = 'game' | 'leaderboard' | 'profile' | 'chat' | 'settings' | 'welcome';
+export type SectionType = 'game' | 'leaderboard' | 'profile' | 'chat' | 'ai-assistant' | 'settings' | 'welcome';
 
 export class NavigationController {
     private isNavigating = false;
@@ -12,6 +12,7 @@ export class NavigationController {
     private leaderboardSection: HTMLElement | null;
     private profileSection: HTMLElement | null;
     private chatSection: HTMLElement | null;
+    private aiAssistantSection: HTMLElement | null;
     private settingsSection: HTMLElement | null;
     private gameModeSelection: HTMLElement | null;
     private aiDifficultySelection: HTMLElement | null;
@@ -24,6 +25,7 @@ export class NavigationController {
         this.gameContainer = document.getElementById('game-container');
         this.leaderboardSection = document.getElementById('leaderboardSection');
         this.profileSection = document.getElementById('profileSection');
+        this.aiAssistantSection = document.getElementById('aiAssistantSection');
         this.chatSection = document.getElementById('chatSection');
         this.settingsSection = document.getElementById('settingsSection');
         this.gameModeSelection = document.getElementById('gameModeSelection');
@@ -68,6 +70,7 @@ export class NavigationController {
         this.leaderboardSection?.classList.add('hidden');
         this.profileSection?.classList.add('hidden');
         this.chatSection?.classList.add('hidden');
+        this.aiAssistantSection?.classList.add('hidden');
         this.settingsSection?.classList.add('hidden');
 
         // Reset game UI
@@ -95,6 +98,9 @@ export class NavigationController {
                 break;
             case 'chat':
                 this.chatSection?.classList.remove('hidden');
+                break;
+            case 'ai-assistant':
+                this.aiAssistantSection?.classList.remove('hidden');
                 break;
             case 'settings':
                 this.settingsSection?.classList.remove('hidden');

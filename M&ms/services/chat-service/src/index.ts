@@ -7,6 +7,7 @@ import { registerJwt } from './lib/jwt.js';
 import prisma from './lib/prisma.js';
 import chatRoutes from './routes/messages.js';
 import wsHandler from './routes/websocket.js';
+import aiRoutes from './routes/ai.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ async function start(): Promise<void> {
         await registerJwt(fastify);
 
         await fastify.register(chatRoutes, { prefix: '/api/chat' });
+        await fastify.register(aiRoutes, { prefix: '/api/chat' });
         await fastify.register(wsHandler, { prefix: '/api/chat' });
 
         fastify.get('/health', async () => ({

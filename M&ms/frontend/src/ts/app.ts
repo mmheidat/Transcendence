@@ -11,6 +11,7 @@ import { LeaderboardController } from './controllers/LeaderboardController.js';
 import { SettingsController } from './controllers/SettingsController.js';
 import { GameSocketService } from './services/GameSocketService.js';
 import { showNotification, showGameInvitePopup } from './utils/NotificationUtils.js';
+import { AiAssistantPage } from './pages/AiAssistant.js';
 
 // ============================================================================
 // CONTROLLERS
@@ -25,6 +26,7 @@ const profileController = new ProfileController();
 const leaderboardController = new LeaderboardController();
 const settingsController = new SettingsController();
 const gameSocketService = GameSocketService.getInstance();
+const aiAssistantPage = new AiAssistantPage();
 
 // ============================================================================
 // DOM ELEMENTS
@@ -39,6 +41,7 @@ const navPlay = document.getElementById('navPlay') as HTMLButtonElement;
 const navLeaderboard = document.getElementById('navLeaderboard') as HTMLButtonElement;
 const navProfile = document.getElementById('navProfile') as HTMLButtonElement;
 const navChat = document.getElementById('navChat') as HTMLButtonElement;
+const navAi = document.getElementById('navAi') as HTMLButtonElement;
 const navSettings = document.getElementById('navSettings') as HTMLButtonElement;
 const navLogout = document.getElementById('navLogout') as HTMLButtonElement;
 
@@ -167,6 +170,7 @@ function setupEventListeners(): void {
     navLeaderboard?.addEventListener('click', () => navigationController.showSection('leaderboard'));
     navProfile?.addEventListener('click', () => navigationController.showSection('profile'));
     navChat?.addEventListener('click', () => navigationController.showSection('chat'));
+    navAi?.addEventListener('click', () => navigationController.showSection('ai-assistant'));
     navSettings?.addEventListener('click', () => navigationController.showSection('settings'));
 
     // Logout
@@ -209,6 +213,9 @@ function setupEventListeners(): void {
                 break;
             case 'chat':
                 chatController.loadSocialData();
+                break;
+            case 'ai-assistant':
+                aiAssistantPage.initialize();
                 break;
             case 'settings':
                 settingsController.check2faStatus();
