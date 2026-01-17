@@ -203,7 +203,7 @@ export class ChatController {
                             <div class="relative">
                                 ${friend.avatar_url
                     ? `<img src="${friend.avatar_url}" class="rounded-full w-10 h-10 object-cover">`
-                    : `<div class="bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold">
+                    : `<div class="bg-indigo-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold">
                                             ${(friend.display_name || friend.username).charAt(0).toUpperCase()}
                                        </div>`}
                                 <div class="absolute bottom-0 right-0 w-3 h-3 ${friend.is_online ? 'bg-green-500' : 'bg-gray-500'} rounded-full border-2 border-gray-700"></div>
@@ -308,7 +308,7 @@ export class ChatController {
             } else {
                 chatAvatar.innerHTML = '';
                 chatAvatar.textContent = userName.charAt(0).toUpperCase();
-                chatAvatar.className = 'bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold';
+                chatAvatar.className = 'bg-indigo-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold';
             }
         }
 
@@ -341,7 +341,7 @@ export class ChatController {
                 return `
                     <div class="flex items-start space-x-2 justify-end">
                         <div>
-                            <div class="bg-purple-600 rounded-lg p-3 max-w-xs">
+                            <div class="bg-indigo-600 rounded-lg p-3 max-w-xs">
                                 <p class="text-white text-sm">${msg.content}</p>
                             </div>
                             <p class="text-gray-500 text-xs mt-1 mr-2 text-right">${time}</p>
@@ -351,7 +351,7 @@ export class ChatController {
             } else {
                 const avatarHtml = this.currentChatUserAvatar
                     ? `<img src="${this.currentChatUserAvatar}" class="rounded-full w-8 h-8 object-cover flex-shrink-0">`
-                    : `<div class="bg-purple-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    : `<div class="bg-indigo-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             ${this.currentChatUserName.charAt(0).toUpperCase()}
                        </div>`;
                 return `
@@ -387,7 +387,7 @@ export class ChatController {
             messageDiv.className = 'flex items-start space-x-2 justify-end';
             messageDiv.innerHTML = `
                 <div>
-                    <div class="bg-purple-600 rounded-lg p-3 max-w-xs">
+                    <div class="bg-indigo-600 rounded-lg p-3 max-w-xs">
                         <p class="text-white text-sm">${message}</p>
                     </div>
                     <p class="text-gray-500 text-xs mt-1 mr-2 text-right">
@@ -417,7 +417,7 @@ export class ChatController {
         if (this.currentChatUserId && message.from === this.currentChatUserId) {
             const avatarHtml = this.currentChatUserAvatar
                 ? `<img src="${this.currentChatUserAvatar}" class="rounded-full w-8 h-8 object-cover flex-shrink-0">`
-                : `<div class="bg-purple-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                : `<div class="bg-indigo-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         ${this.currentChatUserName.charAt(0).toUpperCase()}
                    </div>`;
 

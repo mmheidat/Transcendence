@@ -20,13 +20,13 @@ export class PrivacyPolicyPage {
                         Last updated: January 17, 2026
                     </p>
                     <p class="text-gray-300 mb-6">
-                        This Privacy Policy describes how Pong Game ("we", "us", or "our") collects, uses, and protects your personal information when you use our online multiplayer pong gaming platform.
+                        This Privacy Policy describes how M&ms Pong Game ("we", "us", or "our") collects, uses, and protects your personal information when you use our online multiplayer pong gaming platform.
                     </p>
                 </div>
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -81,7 +81,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -103,7 +103,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
@@ -128,7 +128,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                         </svg>
@@ -150,7 +150,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                         </svg>
@@ -169,7 +169,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -191,7 +191,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
@@ -215,7 +215,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -230,7 +230,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
@@ -245,7 +245,7 @@ export class PrivacyPolicyPage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
@@ -256,7 +256,7 @@ export class PrivacyPolicyPage {
                             If you have any questions about this Privacy Policy or wish to exercise your data rights, please contact us at:
                         </p>
                         <div class="bg-gray-700 rounded-lg p-4">
-                            <p class="font-semibold mb-2">Pong Game Privacy Team</p>
+                            <p class="font-semibold mb-2">M&ms Pong Game Privacy Team</p>
                             <p>Email: privacy@ponggame.example</p>
                             <p>For general inquiries: support@ponggame.example</p>
                         </div>
@@ -264,7 +264,7 @@ export class PrivacyPolicyPage {
                 </div>
 
                 <div class="text-center mt-8">
-                    <button id="backFromPrivacy" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-300">
+                    <button id="backFromPrivacy" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-300">
                         Back to Game
                     </button>
                 </div>

@@ -67,7 +67,7 @@ export class LeaderboardController {
                         <span class="text-gray-400 font-bold text-lg w-8">${index + 4}</span>
                         <span class="text-white font-semibold">${player.display_name || player.username}</span>
                     </div>
-                    <span class="text-purple-400 font-bold">${player.wins} wins</span>
+                    <span class="text-indigo-400 font-bold">${player.wins} wins</span>
                 </div>
             `).join('');
             otherRankings.innerHTML = othersHtml;

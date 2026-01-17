@@ -368,9 +368,9 @@ class Game {
         gameOverDiv.innerHTML = `
             <div class="bg-gray-800 rounded-lg p-8 text-center">
                 <h2 class="text-4xl font-bold text-white mb-4">Game Over!</h2>
-                <p class="text-2xl text-purple-400 mb-6">${this.winnerName} Wins! 🎉</p>
+                <p class="text-2xl text-indigo-400 mb-6">${this.winnerName} Wins! 🎉</p>
                 <p class="text-white text-xl mb-8">Final Score: ${this.leftScore} - ${this.rightScore}</p>
-                <button id="playAgainBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 mr-4">
+                <button id="playAgainBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 mr-4">
                     Play Again
                 </button>
                 <button id="exitGameBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300">

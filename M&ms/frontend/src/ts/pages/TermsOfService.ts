@@ -20,20 +20,20 @@ export class TermsOfServicePage {
                         Last updated: January 17, 2026
                     </p>
                     <p class="text-gray-300 mb-6">
-                        Welcome to Pong Game. These Terms of Service ("Terms") govern your access to and use of our online multiplayer pong gaming platform. By accessing or using our service, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our service.
+                        Welcome to M&ms Pong Game. These Terms of Service ("Terms") govern your access to and use of our online multiplayer pong gaming platform. By accessing or using our service, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our service.
                     </p>
                 </div>
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Acceptance of Terms
                     </h2>
                     <div class="text-gray-300 space-y-4">
-                        <p>By creating an account or using Pong Game, you:</p>
+                        <p>By creating an account or using M&ms Pong Game, you:</p>
                         <ul class="list-disc pl-6 mt-2 space-y-2">
                             <li>Confirm that you are at least 13 years of age</li>
                             <li>Agree to comply with all applicable laws and regulations</li>
@@ -45,7 +45,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
@@ -80,7 +80,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -105,7 +105,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -139,7 +139,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
@@ -168,14 +168,14 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                         Intellectual Property
                     </h2>
                     <div class="text-gray-300 space-y-4">
-                        <p>All content and materials on Pong Game, including but not limited to:</p>
+                        <p>All content and materials on M&ms Pong Game, including but not limited to:</p>
                         <ul class="list-disc pl-6 mt-2 space-y-1">
                             <li>Game design, graphics, and sound effects</li>
                             <li>Software code and architecture</li>
@@ -190,7 +190,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
@@ -213,7 +213,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                         </svg>
@@ -253,7 +253,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -275,7 +275,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -298,7 +298,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                         </svg>
@@ -317,7 +317,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
@@ -340,7 +340,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -359,7 +359,7 @@ export class TermsOfServicePage {
 
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
                     <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
@@ -370,7 +370,7 @@ export class TermsOfServicePage {
                             If you have questions about these Terms or need to report a violation, please contact us at:
                         </p>
                         <div class="bg-gray-700 rounded-lg p-4">
-                            <p class="font-semibold mb-2">Pong Game Support Team</p>
+                            <p class="font-semibold mb-2">M&ms Pong Game Support Team</p>
                             <p>Email: support@ponggame.example</p>
                             <p>Legal inquiries: legal@ponggame.example</p>
                             <p>Abuse reports: abuse@ponggame.example</p>
@@ -378,14 +378,14 @@ export class TermsOfServicePage {
                     </div>
                 </div>
 
-                <div class="bg-purple-900 bg-opacity-50 rounded-lg p-6 mb-6 border border-purple-500">
+                <div class="bg-indigo-900 bg-opacity-50 rounded-lg p-6 mb-6 border border-indigo-500">
                     <p class="text-gray-300 text-center">
-                        <strong class="text-white">By using Pong Game, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</strong>
+                        <strong class="text-white">By using M&ms Pong Game, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</strong>
                     </p>
                 </div>
 
                 <div class="text-center mt-8">
-                    <button id="backFromTerms" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-300">
+                    <button id="backFromTerms" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-300">
                         Back to Game
                     </button>
                 </div>

@@ -199,12 +199,12 @@ export class SettingsController {
 
         if (enabled) {
             this.toggle2faBtn.textContent = 'Disable 2FA';
-            this.toggle2faBtn.classList.replace('bg-purple-600', 'bg-red-600');
-            this.toggle2faBtn.classList.replace('hover:bg-purple-700', 'hover:bg-red-700');
+            this.toggle2faBtn.classList.replace('bg-indigo-600', 'bg-red-600');
+            this.toggle2faBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-red-700');
         } else {
             this.toggle2faBtn.textContent = 'Enable 2FA';
-            this.toggle2faBtn.classList.replace('bg-red-600', 'bg-purple-600');
-            this.toggle2faBtn.classList.replace('hover:bg-red-700', 'hover:bg-purple-700');
+            this.toggle2faBtn.classList.replace('bg-red-600', 'bg-indigo-600');
+            this.toggle2faBtn.classList.replace('hover:bg-red-700', 'hover:bg-indigo-700');
         }
     }
 }

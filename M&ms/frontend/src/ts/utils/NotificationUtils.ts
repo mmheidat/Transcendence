@@ -26,13 +26,13 @@ export function showGameInvitePopup(
 ): void {
     const popup = document.createElement('div');
     popup.id = `invite-${invite.id}`;
-    popup.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-700 to-indigo-800 text-white px-6 py-4 rounded-lg shadow-2xl z-50 border border-purple-500';
+    popup.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-700 to-indigo-800 text-white px-6 py-4 rounded-lg shadow-2xl z-50 border border-indigo-500';
     popup.innerHTML = `
         <div class="flex items-center space-x-4">
             <div class="text-3xl">🎮</div>
             <div class="flex-1">
                 <p class="font-bold text-lg">${invite.from_username} wants to play!</p>
-                <p class="text-purple-200 text-sm">Game invite received</p>
+                <p class="text-indigo-200 text-sm">Game invite received</p>
             </div>
             <div class="flex space-x-2">
                 <button id="accept-${invite.id}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-bold transition">Accept</button>
