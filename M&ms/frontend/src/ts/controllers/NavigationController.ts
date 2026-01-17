@@ -1,6 +1,6 @@
 // Navigation controller for section switching and browser history
 
-export type SectionType = 'game' | 'leaderboard' | 'profile' | 'chat' | 'ai-assistant' | 'settings' | 'welcome';
+export type SectionType = 'game' | 'leaderboard' | 'profile' | 'chat' | 'ai-assistant' | 'settings' | 'welcome' | 'privacy-policy' | 'terms-of-service';
 
 export class NavigationController {
     private isNavigating = false;
@@ -14,6 +14,8 @@ export class NavigationController {
     private chatSection: HTMLElement | null;
     private aiAssistantSection: HTMLElement | null;
     private settingsSection: HTMLElement | null;
+    private privacyPolicySection: HTMLElement | null;
+    private termsOfServiceSection: HTMLElement | null;
     private gameModeSelection: HTMLElement | null;
     private aiDifficultySelection: HTMLElement | null;
     private actualGameCanvas: HTMLElement | null;
@@ -28,6 +30,8 @@ export class NavigationController {
         this.aiAssistantSection = document.getElementById('aiAssistantSection');
         this.chatSection = document.getElementById('chatSection');
         this.settingsSection = document.getElementById('settingsSection');
+        this.privacyPolicySection = document.getElementById('privacyPolicySection');
+        this.termsOfServiceSection = document.getElementById('termsOfServiceSection');
         this.gameModeSelection = document.getElementById('gameModeSelection');
         this.aiDifficultySelection = document.getElementById('aiDifficultySelection');
         this.actualGameCanvas = document.getElementById('actualGameCanvas');
@@ -72,6 +76,8 @@ export class NavigationController {
         this.chatSection?.classList.add('hidden');
         this.aiAssistantSection?.classList.add('hidden');
         this.settingsSection?.classList.add('hidden');
+        this.privacyPolicySection?.classList.add('hidden');
+        this.termsOfServiceSection?.classList.add('hidden');
 
         // Reset game UI
         this.gameModeSelection?.classList.remove('hidden');
@@ -104,6 +110,12 @@ export class NavigationController {
                 break;
             case 'settings':
                 this.settingsSection?.classList.remove('hidden');
+                break;
+            case 'privacy-policy':
+                this.privacyPolicySection?.classList.remove('hidden');
+                break;
+            case 'terms-of-service':
+                this.termsOfServiceSection?.classList.remove('hidden');
                 break;
             case 'welcome':
                 this.welcomeSection?.classList.remove('hidden');

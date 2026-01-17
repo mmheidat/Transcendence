@@ -12,6 +12,8 @@ import { SettingsController } from './controllers/SettingsController.js';
 import { GameSocketService } from './services/GameSocketService.js';
 import { showNotification, showGameInvitePopup } from './utils/NotificationUtils.js';
 import { AiAssistantPage } from './pages/AiAssistant.js';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicy.js';
+import { TermsOfServicePage } from './pages/TermsOfService.js';
 
 // ============================================================================
 // CONTROLLERS
@@ -27,6 +29,8 @@ const leaderboardController = new LeaderboardController();
 const settingsController = new SettingsController();
 const gameSocketService = GameSocketService.getInstance();
 const aiAssistantPage = new AiAssistantPage();
+const privacyPolicyPage = new PrivacyPolicyPage();
+const termsOfServicePage = new TermsOfServicePage();
 
 // ============================================================================
 // DOM ELEMENTS
@@ -172,6 +176,24 @@ function setupEventListeners(): void {
     navChat?.addEventListener('click', () => navigationController.showSection('chat'));
     navAi?.addEventListener('click', () => navigationController.showSection('ai-assistant'));
     navSettings?.addEventListener('click', () => navigationController.showSection('settings'));
+
+    // Footer links
+    const footerPrivacyLink = document.getElementById('footerPrivacyLink');
+    const footerTermsLink = document.getElementById('footerTermsLink');
+    
+    footerPrivacyLink?.addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        navigationController.showSection('privacy-policy');
+    });
+    
+    footerTermsLink?.addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        navigationController.showSection('terms-of-service');
+    });
+
+    // Setup event listeners for back buttons in privacy and terms pages
+    privacyPolicyPage.setupEventListeners();
+    termsOfServicePage.setupEventListeners();
 
     // Logout
     navLogout?.addEventListener('click', async () => {
