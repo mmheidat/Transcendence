@@ -13,6 +13,7 @@ import SettingsPage from './pages/Settings';
 import Tournament from './pages/Tournament';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import MeetTheDevs from './pages/MeetTheDevs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 
@@ -39,6 +40,7 @@ function AppRoutes() {
             <Route path="/register" element={<Register />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/meet-the-devs" element={<MeetTheDevs />} />
 
             <Route path="/*" element={
                 <ProtectedRoute>
