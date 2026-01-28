@@ -14,7 +14,7 @@ dotenv.config();
 const SERVICE_NAME = 'chat-service';
 const PORT = parseInt(process.env.PORT || '3004');
 
-console.log(`🚀 Starting ${SERVICE_NAME}...`);
+// console.log(`🚀 Starting ${SERVICE_NAME}...`);
 
 const fastify = Fastify({
     logger: {
@@ -29,7 +29,7 @@ const fastify = Fastify({
 async function start(): Promise<void> {
     try {
         await prisma.$connect();
-        console.log('✅ Database connected');
+        // console.log('✅ Database connected');
 
         await fastify.register(cors, {
             origin: process.env.FRONTEND_URL || 'https://localhost:8443',
@@ -49,7 +49,7 @@ async function start(): Promise<void> {
         }));
 
         await fastify.listen({ port: PORT, host: '0.0.0.0' });
-        console.log(`✅ ${SERVICE_NAME} running on port ${PORT}`);
+        // console.log(`✅ ${SERVICE_NAME} running on port ${PORT}`);
     } catch (err) {
         console.error('❌ Failed to start:', err);
         process.exit(1);

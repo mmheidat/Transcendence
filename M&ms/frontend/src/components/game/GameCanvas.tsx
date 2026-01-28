@@ -57,35 +57,9 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
         }
     };
 
-    const [isTooSmall, setIsTooSmall] = useState(false);
-
-    // Monitor screen size
-    useEffect(() => {
-        const checkSize = () => {
-            const tooSmall = window.innerWidth < 1000;
-            setIsTooSmall(tooSmall);
-        };
-
-        checkSize(); // Initial check
-        window.addEventListener('resize', checkSize);
-        return () => window.removeEventListener('resize', checkSize);
-    }, []);
-
-
-
     return (
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center">
 
-            {/* Screen Too Small Overlay */}
-            {isTooSmall && (
-                <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center text-center p-8">
-                    <AlertTriangle className="text-yellow-500 mb-6" size={64} />
-                    <h1 className="text-3xl font-bold text-white mb-4">Screen Too Small</h1>
-                    <p className="text-gray-400 max-w-md">
-                        To ensure the best gameplay experience, please maximize your window or play on a larger screen.
-                    </p>
-                </div>
-            )}
 
             {/* Header info */}
             <div className="flex justify-between w-full mb-4 px-4 items-center">
@@ -195,16 +169,18 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
                         )}
 
                         <div className="flex space-x-4">
-                            <button
-                                onClick={() => {
-                                    resetGame();
-                                    startGame();
-                                }}
-                                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-all hover:shadow-lg hover:shadow-green-500/30"
-                            >
-                                <RotateCcw size={20} />
-                                <span>Play Again</span>
-                            </button>
+                            {mode !== 'online' && (
+                                <button
+                                    onClick={() => {
+                                        resetGame();
+                                        startGame();
+                                    }}
+                                    className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-all hover:shadow-lg hover:shadow-green-500/30"
+                                >
+                                    <RotateCcw size={20} />
+                                    <span>Play Again</span>
+                                </button>
+                            )}
 
                             <Link
                                 to="/play"

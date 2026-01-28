@@ -100,7 +100,7 @@ const Chat: React.FC = () => {
         loadData();
 
         const handleConnected = () => {
-            console.log('Chat connected to WS');
+            // console.log('Chat connected to WS');
         };
 
         // @ts-ignore

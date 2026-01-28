@@ -53,7 +53,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
             return;
         }
 
-        console.log(`WebSocket connected: user ${userId}`);
+        // console.log(`WebSocket connected: user ${userId}`);
 
         // Update DB status to online
         try {
@@ -73,14 +73,14 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
 
         // Handle messages - SocketStream uses 'data' event, not 'message'
         connection.socket.on('message', async (data: Buffer) => {
-            console.log(`📨 Raw message received from user ${userId}:`, data.toString());
+            // console.log(`📨 Raw message received from user ${userId}:`, data.toString());
             try {
                 const message = JSON.parse(data.toString());
-                console.log(`✅ Parsed message from ${userId}:`, JSON.stringify(message, null, 2));
+                // console.log(`✅ Parsed message from ${userId}:`, JSON.stringify(message, null, 2));
 
                 switch (message.type) {
                     case 'aiPrompt':
-                        console.log(`🤖 Processing aiPrompt for user ${userId}`);
+                        // console.log(`🤖 Processing aiPrompt for user ${userId}`);
                         try {
                             await handleAiPrompt(connection.socket as WebSocket, userId, message);
                         } catch (err) {
@@ -94,7 +94,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
                         }
                         break;
                     case 'aiCancel':
-                        console.log(`🛑 Processing aiCancel for user ${userId}`);
+                        // console.log(`🛑 Processing aiCancel for user ${userId}`);
                         try {
                             await handleAiCancel(userId, message);
                         } catch (err) {
@@ -102,15 +102,15 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
                         }
                         break;
                     case 'game_invite':
-                        console.log(`🎮 Processing game_invite from user ${userId} to ${message.to_user_id}`);
+                        // console.log(`🎮 Processing game_invite from user ${userId} to ${message.to_user_id}`);
                         handleGameInvite(connection.socket as WebSocket, userId, message);
                         break;
                     case 'game_invite_accept':
-                        console.log(`🎮 Processing game_invite_accept from user ${userId}`);
+                        // console.log(`🎮 Processing game_invite_accept from user ${userId}`);
                         handleGameInviteAccept(connection.socket as WebSocket, userId, message);
                         break;
                     case 'game_invite_decline':
-                        console.log(`🎮 Processing game_invite_decline from user ${userId}`);
+                        // console.log(`🎮 Processing game_invite_decline from user ${userId}`);
                         handleGameInviteDecline(connection.socket as WebSocket, userId, message);
                         break;
                     case 'game_paddle_update':
@@ -136,7 +136,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
                         connection.socket.send(JSON.stringify({ type: 'pong' }));
                         break;
                     default:
-                        console.log('⚠️ Unknown message type:', message.type);
+                    // console.log('⚠️ Unknown message type:', message.type);
                 }
             } catch (err) {
                 console.error('❌ Invalid message format:', err);
@@ -145,7 +145,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
 
         // Handle disconnect
         connection.socket.on('close', async () => {
-            console.log(`WebSocket disconnected: user ${userId}`);
+            // console.log(`WebSocket disconnected: user ${userId}`);
             // Cancel any active AI streams
             const streamKey = `${userId}`;
             const controller = activeStreams.get(streamKey);
@@ -173,7 +173,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
             for (const [gameId, game] of activeGames.entries()) {
                 if ((game.player1 === userId && game.p1Socket === (connection.socket as WebSocket)) ||
                     (game.player2 === userId && game.p2Socket === (connection.socket as WebSocket))) {
-                    console.log(`User ${userId} disconnected from game ${gameId} (socket mismatch or closed) - triggering forfeit`);
+                    // console.log(`User ${userId} disconnected from game ${gameId} (socket mismatch or closed) - triggering forfeit`);
                     handleGameForfeit(userId, gameId, game);
                 }
             }
@@ -262,18 +262,18 @@ async function handleAiPrompt(connection: WebSocket, userId: number, message: an
 
         let fullResponse = '';
         let chunkCount = 0;
-        console.log('🚀 Starting AI stream...');
+        // console.log('🚀 Starting AI stream...');
         try {
             for await (const chunk of generateContentStream(prompt, history)) {
                 if (controller.signal.aborted) {
-                    console.log(`Stream cancelled for user ${userId}`);
+                    // console.log(`Stream cancelled for user ${userId}`);
                     break;
                 }
 
                 if (!chunk.done && chunk.text) {
                     chunkCount++;
                     fullResponse += chunk.text;
-                    console.log(`📤 Chunk ${chunkCount}: ${chunk.text.length} chars`);
+                    // console.log(`📤 Chunk ${chunkCount}: ${chunk.text.length} chars`);
 
                     // Send full chunks immediately for faster streaming
                     connection.send(JSON.stringify({
@@ -284,7 +284,7 @@ async function handleAiPrompt(connection: WebSocket, userId: number, message: an
                 }
 
                 if (chunk.done) {
-                    console.log(`✅ Stream complete! Total chunks: ${chunkCount}, Total length: ${fullResponse.length}`);
+                    // console.log(`✅ Stream complete! Total chunks: ${chunkCount}, Total length: ${fullResponse.length}`);
 
                     // Wait for user message to be saved before saving assistant message
                     await userMessagePromise;
@@ -305,7 +305,7 @@ async function handleAiPrompt(connection: WebSocket, userId: number, message: an
                     });
 
                     // Send done
-                    console.log('📨 Sending aiDone message');
+                    // console.log('📨 Sending aiDone message');
                     connection.send(JSON.stringify({
                         type: 'aiDone',
                         conversationId: conversation.id,
@@ -339,7 +339,7 @@ async function handleAiCancel(userId: number, message: any) {
     if (controller) {
         controller.abort();
         activeStreams.delete(streamKey);
-        console.log(`AI stream cancelled for user ${userId}`);
+        // console.log(`AI stream cancelled for user ${userId}`);
     }
 }
 
@@ -425,7 +425,7 @@ async function handleGameInvite(connection: WebSocket, fromUserId: number, messa
         }
         // Confirm to sender
         connection.send(JSON.stringify({ type: 'game_invite_sent', invite_id: inviteId }));
-        console.log(`🎮 Game invite sent from ${fromUserId} to ${to_user_id}`);
+        // console.log(`🎮 Game invite sent from ${fromUserId} to ${to_user_id}`);
     } else {
         connection.send(JSON.stringify({
             type: 'game_invite_error',
@@ -507,7 +507,7 @@ async function handleGameInviteAccept(connection: WebSocket, userId: number, mes
     // Register as active game with DB ID
     registerActiveGame(gameId, invite.fromUserId, userId, dbGame.id);
 
-    console.log(`🎮 Game started: ${invite.fromUserId} vs ${userId} (DB ID: ${dbGame.id})`);
+    // console.log(`🎮 Game started: ${invite.fromUserId} vs ${userId} (DB ID: ${dbGame.id})`);
 }
 
 // Game Invite Decline Handler
@@ -535,7 +535,7 @@ function handleGameInviteDecline(connection: WebSocket, userId: number, message:
         }
     }
 
-    console.log(`🎮 Game invite ${invite_id} declined by user ${userId}`);
+    // console.log(`🎮 Game invite ${invite_id} declined by user ${userId}`);
 }
 
 // Active games: gameId -> { player1: userId, player2: userId, dbGameId: number, p1Socket?: WebSocket, p2Socket?: WebSocket }
@@ -566,7 +566,7 @@ function sendToOpponent(gameId: string, userId: number, message: object): void {
 // Register a new active game
 function registerActiveGame(gameId: string, player1: number, player2: number, dbGameId?: number): void {
     activeGames.set(gameId, { player1, player2, dbGameId: dbGameId || 0 });
-    console.log(`🎮 Active game registered: ${gameId} (${player1} vs ${player2}, DB ID: ${dbGameId || 'unknown'})`);
+    // console.log(`🎮 Active game registered: ${gameId} (${player1} vs ${player2}, DB ID: ${dbGameId || 'unknown'})`);
 }
 
 // Game Paddle Update Handler - forward paddle position to opponent
@@ -663,14 +663,14 @@ async function handleGameEnd(userId: number, message: any): Promise<void> {
                     winnerId: winner_id
                 }
             });
-            console.log(`🎮 Game ${game_id} (DB: ${game.dbGameId}) updated: ${left_score}-${right_score}, Winner: ${winner_id}`);
+            // console.log(`🎮 Game ${game_id} (DB: ${game.dbGameId}) updated: ${left_score}-${right_score}, Winner: ${winner_id}`);
         } catch (err) {
             console.error(`❌ Failed to update game ${game.dbGameId} in DB:`, err);
         }
     }
 
     activeGames.delete(game_id);
-    console.log(`🎮 Game ${game_id} ended.`);
+    // console.log(`🎮 Game ${game_id} ended.`);
 }
 
 // Game Pause Handler
@@ -692,7 +692,7 @@ async function handleGameLeave(userId: number, message: any): Promise<void> {
     const { game_id } = message;
     if (!game_id) return;
 
-    console.log(`Received game_leave from ${userId} for game ${game_id}`);
+    // console.log(`Received game_leave from ${userId} for game ${game_id}`);
 
     const game = activeGames.get(game_id);
     if (!game) {
@@ -729,7 +729,7 @@ async function handleGameForfeit(leaverId: number, gameId: string, game: { playe
                     winnerId: winnerId
                 }
             });
-            console.log(`🎮 Game ${gameId} forfeited by ${leaverId}. Winner: ${winnerId}`);
+            // console.log(`🎮 Game ${gameId} forfeited by ${leaverId}. Winner: ${winnerId}`);
         } catch (err) {
             console.error(`❌ Failed to update game ${game.dbGameId} forfeit:`, err);
         }

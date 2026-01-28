@@ -24,13 +24,7 @@ const Navbar: React.FC = () => {
                             M&MS
                         </h1>
 
-                        <select className="hidden sm:block bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-rose-500 transition duration-300 text-sm">
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                            <option value="fr">Français</option>
-                            <option value="de">Deutsch</option>
-                            <option value="ar">العربية</option>
-                        </select>
+
                     </div>
 
                     {/* Navigation Items */}

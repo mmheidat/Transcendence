@@ -21,15 +21,24 @@ export class Ball {
     private fireParticles: FireParticle[] = [];
     private fireColors: string[] = ['#ff4500', '#ff6b35', '#ff8c00', '#ffa500', '#ffcc00', '#fff200'];
 
+    // Previous position for CCD
+    prevX: number;
+    prevY: number;
+
     constructor(x: number, y: number, radius: number, speedX: number = 200, speedY: number = 200) {
         this.x = x;
         this.y = y;
+        this.prevX = x;
+        this.prevY = y;
         this.radius = radius;
         this.speedX = speedX;
         this.speedY = speedY;
     }
 
     move(deltaTime: number): void {
+        this.prevX = this.x;
+        this.prevY = this.y;
+
         // Add fire particles when moving in tournament mode
         if (this.isTournament) {
             this.addFireParticles();
@@ -79,65 +88,100 @@ export class Ball {
     resetPosition(canvasWidth: number, canvasHeight: number): void {
         this.x = canvasWidth / 2;
         this.y = canvasHeight / 2;
+        this.prevX = this.x;
+        this.prevY = this.y;
         this.speedX = -this.speedX;
         // Clear fire particles on reset
         this.fireParticles = [];
     }
 
     detectCollision(paddle: Paddle): void {
-        // Check if ball is within paddle's x range
-        const ballLeft = this.x - this.radius;
-        const ballRight = this.x + this.radius;
-        const ballTop = this.y - this.radius;
-        const ballBottom = this.y + this.radius;
-
         const paddleLeft = paddle.x;
         const paddleRight = paddle.x + paddle.width;
         const paddleTop = paddle.y;
         const paddleBottom = paddle.y + paddle.height;
 
-        // Check for collision
-        if (ballRight > paddleLeft &&
-            ballLeft < paddleRight &&
-            ballBottom > paddleTop &&
-            ballTop < paddleBottom) {
+        // Determine collision direction based on velocity
+        // If moving right, we check collision with left face of paddle
+        // If moving left, we check collision with right face of paddle
+        const movingRight = this.speedX > 0;
 
-            // Calculate where on the paddle the ball hit (0 = top, 1 = bottom)
-            const hitPosition = (this.y - paddleTop) / paddle.height;
+        // Check temporal overlap (CCD)
+        // Check if we crossed the paddle horizontally
+        let crossedX = false;
 
-            // Calculate angle based on hit position (-1 to 1, where 0 is center)
-            const relativeIntersectY = (hitPosition - 0.5) * 2;
+        if (movingRight) {
+            // Moving right: Check if we crossed paddle's left edge
+            crossedX = this.prevX - this.radius <= paddleLeft && this.x + this.radius >= paddleLeft;
+        } else {
+            // Moving left: Check if we crossed paddle's right edge
+            crossedX = this.prevX + this.radius >= paddleRight && this.x - this.radius <= paddleRight;
+        }
 
-            // Maximum bounce angle (in radians, ~60 degrees)
-            const maxBounceAngle = Math.PI / 3;
+        // Standard AABB overlap check as fallback (for low speeds)
+        const overlaps = (
+            this.x + this.radius >= paddleLeft &&
+            this.x - this.radius <= paddleRight &&
+            this.y + this.radius >= paddleTop &&
+            this.y - this.radius <= paddleBottom
+        );
 
-            // Calculate bounce angle
-            const bounceAngle = relativeIntersectY * maxBounceAngle;
+        if (crossedX || overlaps) {
+            // Precise vertical check for crossing:
+            // Interpolate Y at the X intersection point to see if it was within paddle height
+            // Simple approach: Check if Y range overlaps paddle Y range
+            const ballTop = Math.min(this.prevY, this.y) - this.radius;
+            const ballBottom = Math.max(this.prevY, this.y) + this.radius;
 
-            // Calculate speed magnitude
-            const speed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+            if (ballBottom >= paddleTop && ballTop <= paddleBottom) {
+                // COLLISION CONFIRMED
 
-            // Set new velocities based on angle
-            const direction = paddle.x < this.x ? 1 : -1; // Right paddle: positive, left paddle: negative
-            this.speedX = direction * speed * Math.cos(bounceAngle);
-            this.speedY = speed * Math.sin(bounceAngle);
+                // Calculate where on the paddle the ball hit (0 = top, 1 = bottom)
+                // Use current Y for simplicity as it's close enough usually, or clamp to paddle bounds
+                const clampY = Math.max(paddleTop, Math.min(paddleBottom, this.y));
+                const hitPosition = (clampY - paddleTop) / paddle.height;
 
-            // Prevent ball from getting stuck in paddle
-            if (direction > 0) {
-                this.x = paddleRight + this.radius;
-            } else {
-                this.x = paddleLeft - this.radius;
-            }
+                // Calculate angle based on hit position (-1 to 1, where 0 is center)
+                const relativeIntersectY = (hitPosition - 0.5) * 2;
 
-            // Optional: Increase speed slightly with each hit (up to a maximum)
-            const maxSpeed = 1200; // Increased for time-based speed
-            const speedIncrease = 1.05;
-            const newSpeed = Math.min(speed * speedIncrease, maxSpeed);
-            const currentSpeed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+                // Maximum bounce angle (in radians, ~60 degrees)
+                const maxBounceAngle = Math.PI / 3;
 
-            if (currentSpeed > 0) {
-                this.speedX = (this.speedX / currentSpeed) * newSpeed;
-                this.speedY = (this.speedY / currentSpeed) * newSpeed;
+                // Calculate bounce angle
+                const bounceAngle = relativeIntersectY * maxBounceAngle;
+
+                // Calculate speed magnitude
+                const speed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+
+                // FORCE direction away from the paddle
+                // If we hit a paddle on the left (paddle.x < center), we bounce RIGHT (1)
+                // If we hit a paddle on the right, we bounce LEFT (-1)
+                // BUT determining which paddle is tricky if we just have 'paddle'.
+                // Heuristic: If we were moving right, we must reflect left. If moving left, reflect right.
+                const newDirection = movingRight ? -1 : 1;
+
+                this.speedX = newDirection * speed * Math.cos(bounceAngle);
+                this.speedY = speed * Math.sin(bounceAngle);
+
+                // Teleport ball out of paddle to prevent sticking
+                if (newDirection > 0) {
+                    // Bouncing RIGHT -> Place at paddle Right edge
+                    this.x = paddleRight + this.radius + 1;
+                } else {
+                    // Bouncing LEFT -> Place at paddle Left edge
+                    this.x = paddleLeft - this.radius - 1;
+                }
+
+                // Optional: Increase speed slightly
+                const maxSpeed = 1200;
+                const speedIncrease = 1.05;
+                const newSpeed = Math.min(speed * speedIncrease, maxSpeed);
+                const currentSpeed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+
+                if (currentSpeed > 0) {
+                    this.speedX = (this.speedX / currentSpeed) * newSpeed;
+                    this.speedY = (this.speedY / currentSpeed) * newSpeed;
+                }
             }
         }
     }

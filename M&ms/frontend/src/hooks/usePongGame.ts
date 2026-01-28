@@ -39,7 +39,7 @@ export const usePongGame = (
     const initGame = useCallback(() => {
         if (!canvasRef.current) return;
 
-        console.log("Initializing Pong Engine", gameMode, difficulty);
+        // console.log("Initializing Pong Engine", gameMode, difficulty);
         const engine = new PongEngine(canvasRef.current, gameMode, difficulty);
 
         // Setup Callbacks
@@ -95,7 +95,7 @@ export const usePongGame = (
                     const amIWinner = (onlineConfig.isHost && winnerSide === 'left') || (!onlineConfig.isHost && winnerSide === 'right');
                     winnerName = amIWinner ? 'You' : 'Opponent';
 
-                    console.log(`Game Over received. Winner: ${winnerSide} (${winnerName})`);
+                    // console.log(`Game Over received. Winner: ${winnerSide} (${winnerName})`);
 
                     isPlayingRef.current = false;
                     setGameState(prev => ({
