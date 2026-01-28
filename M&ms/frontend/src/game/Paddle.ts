@@ -12,14 +12,15 @@ export class Paddle {
         this.width = width;
         this.height = height;
         this.color = color;
-        this.speed = 5;
+        this.speed = 400; // pixels per second
     }
 
-    move(up: boolean, canvasHeight: number): void {
+    move(up: boolean, canvasHeight: number, deltaTime: number): void {
+        const distance = this.speed * deltaTime;
         if (up) {
-            this.y -= this.speed;
+            this.y -= distance;
         } else {
-            this.y += this.speed;
+            this.y += distance;
         }
 
         // Prevent paddle from going out of bounds

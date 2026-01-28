@@ -114,7 +114,12 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
             }),
             // Fetch all games to calculate streak
             prisma.game.findMany({
-                where: { OR: [{ player1Id: userId }, { player2Id: userId }] },
+                where: {
+                    AND: [
+                        { OR: [{ player1Id: userId }, { player2Id: userId }] },
+                        { winnerId: { not: null } }
+                    ]
+                },
                 orderBy: { playedAt: 'asc' },
                 select: { winnerId: true }
             })
@@ -149,7 +154,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     fastify.get('/search', { preHandler: [authenticate] }, async (request, reply) => {
         const { q } = request.query as { q?: string };
 
-        if (!q || q.length < 2) {
+        if (!q || q.length < 1) {
             return reply.send({ users: [] });
         }
 

@@ -55,6 +55,16 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
 
         console.log(`WebSocket connected: user ${userId}`);
 
+        // Update DB status to online
+        try {
+            await prisma.user.update({
+                where: { id: userId },
+                data: { isOnline: true, lastSeen: new Date() }
+            });
+        } catch (e) {
+            console.error(`Failed to update user ${userId} status to online`, e);
+        }
+
         // Register client - use connection.socket for the underlying WebSocket
         if (!clients.has(userId)) {
             clients.set(userId, new Set());
@@ -104,7 +114,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
                         handleGameInviteDecline(connection.socket as WebSocket, userId, message);
                         break;
                     case 'game_paddle_update':
-                        handleGamePaddleUpdate(userId, message);
+                        handleGamePaddleUpdate(userId, message, connection.socket as WebSocket);
                         break;
                     case 'game_state':
                         handleGameState(userId, message);
@@ -134,7 +144,7 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
         });
 
         // Handle disconnect
-        connection.socket.on('close', () => {
+        connection.socket.on('close', async () => {
             console.log(`WebSocket disconnected: user ${userId}`);
             // Cancel any active AI streams
             const streamKey = `${userId}`;
@@ -148,13 +158,23 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
             if (clients.get(userId)?.size === 0) {
                 clients.delete(userId);
 
-                // Check if user was in an active game and forfeit it
-                // We need to find if this user is in any active game
-                for (const [gameId, game] of activeGames.entries()) {
-                    if (game.player1 === userId || game.player2 === userId) {
-                        console.log(`User ${userId} disconnected during game ${gameId} - triggering forfeit`);
-                        handleGameForfeit(userId, gameId, game);
-                    }
+                // Update DB status to offline since no connections remain
+                try {
+                    await prisma.user.update({
+                        where: { id: userId },
+                        data: { isOnline: false, lastSeen: new Date() }
+                    });
+                } catch (e) {
+                    console.error(`Failed to update user ${userId} status to offline`, e);
+                }
+            }
+
+            // Check if this specific socket was in an active game and forfeit it
+            for (const [gameId, game] of activeGames.entries()) {
+                if ((game.player1 === userId && game.p1Socket === (connection.socket as WebSocket)) ||
+                    (game.player2 === userId && game.p2Socket === (connection.socket as WebSocket))) {
+                    console.log(`User ${userId} disconnected from game ${gameId} (socket mismatch or closed) - triggering forfeit`);
+                    handleGameForfeit(userId, gameId, game);
                 }
             }
         });
@@ -430,6 +450,15 @@ async function handleGameInviteAccept(connection: WebSocket, userId: number, mes
         return;
     }
 
+    // Fetch user details for names
+    const [inviter, accepter] = await Promise.all([
+        prisma.user.findUnique({ where: { id: invite.fromUserId }, select: { username: true, displayName: true } }),
+        prisma.user.findUnique({ where: { id: userId }, select: { username: true, displayName: true } })
+    ]);
+
+    const player1Name = inviter?.displayName || inviter?.username || 'Player 1';
+    const player2Name = accepter?.displayName || accepter?.username || 'Player 2';
+
     // Remove the invite
     pendingInvites.delete(invite_id);
 
@@ -451,7 +480,9 @@ async function handleGameInviteAccept(connection: WebSocket, userId: number, mes
         game_id: gameId,
         db_game_id: dbGame.id,
         opponent_id: 0, // Will be set per-user below
-        is_host: false
+        is_host: false,
+        player1_name: player1Name,
+        player2_name: player2Name
     };
 
     // Notify original inviter (they are host)
@@ -507,8 +538,8 @@ function handleGameInviteDecline(connection: WebSocket, userId: number, message:
     console.log(`🎮 Game invite ${invite_id} declined by user ${userId}`);
 }
 
-// Active games: gameId -> { player1: userId, player2: userId, dbGameId: number }
-const activeGames = new Map<string, { player1: number; player2: number; dbGameId: number }>();
+// Active games: gameId -> { player1: userId, player2: userId, dbGameId: number, p1Socket?: WebSocket, p2Socket?: WebSocket }
+const activeGames = new Map<string, { player1: number; player2: number; dbGameId: number; p1Socket?: WebSocket; p2Socket?: WebSocket }>();
 
 // Helper to get opponent in a game
 function getOpponentId(gameId: string, userId: number): number | null {
@@ -539,7 +570,7 @@ function registerActiveGame(gameId: string, player1: number, player2: number, db
 }
 
 // Game Paddle Update Handler - forward paddle position to opponent
-function handleGamePaddleUpdate(userId: number, message: any): void {
+function handleGamePaddleUpdate(userId: number, message: any, socket: WebSocket): void {
     const { game_id, paddle_y } = message;
     if (!game_id) return;
 
@@ -553,6 +584,16 @@ function handleGamePaddleUpdate(userId: number, message: any): void {
             if (!isNaN(player1) && !isNaN(player2)) {
                 registerActiveGame(game_id, player1, player2);
             }
+        }
+    }
+
+    const game = activeGames.get(game_id);
+    if (game) {
+        // Bind socket if missing
+        if (game.player1 === userId && game.p1Socket !== socket) {
+            game.p1Socket = socket;
+        } else if (game.player2 === userId && game.p2Socket !== socket) {
+            game.p2Socket = socket;
         }
     }
 
@@ -651,8 +692,13 @@ async function handleGameLeave(userId: number, message: any): Promise<void> {
     const { game_id } = message;
     if (!game_id) return;
 
+    console.log(`Received game_leave from ${userId} for game ${game_id}`);
+
     const game = activeGames.get(game_id);
-    if (!game) return;
+    if (!game) {
+        console.warn(`handleGameLeave: Game ${game_id} not found.`);
+        return;
+    }
 
     await handleGameForfeit(userId, game_id, game);
 }

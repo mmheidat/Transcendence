@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userService, UserProfile } from '../services/user.service';
 import { authService } from '../services/auth.service';
-import { Settings, Shield, User, Save, Camera, Globe, Users, Mail, X } from 'lucide-react';
+import { Settings, Shield, User, Save, Camera, Mail, X } from 'lucide-react';
 
 const SettingsPage: React.FC = () => {
     const { user, refreshUser } = useAuth();
@@ -16,19 +16,7 @@ const SettingsPage: React.FC = () => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Nationality options
-    const nationalities = [
-        '', 'Afghan', 'Albanian', 'Algerian', 'American', 'Andorran', 'Angolan', 'Argentine', 'Armenian', 'Australian',
-        'Austrian', 'Azerbaijani', 'Bahamian', 'Bahraini', 'Bangladeshi', 'Barbadian', 'Belarusian', 'Belgian', 'Belizean',
-        'Brazilian', 'British', 'Bulgarian', 'Canadian', 'Chilean', 'Chinese', 'Colombian', 'Croatian', 'Cuban', 'Czech',
-        'Danish', 'Dutch', 'Ecuadorian', 'Egyptian', 'Emirati', 'English', 'Estonian', 'Ethiopian', 'Filipino', 'Finnish',
-        'French', 'Georgian', 'German', 'Greek', 'Hungarian', 'Icelandic', 'Indian', 'Indonesian', 'Iranian', 'Iraqi',
-        'Irish', 'Israeli', 'Italian', 'Jamaican', 'Japanese', 'Jordanian', 'Kazakh', 'Kenyan', 'Korean', 'Kuwaiti',
-        'Lebanese', 'Libyan', 'Lithuanian', 'Malaysian', 'Mexican', 'Moroccan', 'New Zealander', 'Nigerian', 'Norwegian',
-        'Omani', 'Pakistani', 'Palestinian', 'Peruvian', 'Polish', 'Portuguese', 'Qatari', 'Romanian', 'Russian', 'Saudi',
-        'Scottish', 'Serbian', 'Singaporean', 'Slovak', 'Slovenian', 'South African', 'Spanish', 'Swedish', 'Swiss',
-        'Syrian', 'Taiwanese', 'Thai', 'Tunisian', 'Turkish', 'Ukrainian', 'Venezuelan', 'Vietnamese', 'Welsh', 'Yemeni'
-    ];
+
 
     useEffect(() => {
         if (user) {
@@ -216,42 +204,7 @@ const SettingsPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Nationality */}
-                            <div>
-                                <label className="block text-gray-400 mb-2 text-sm font-medium">Nationality</label>
-                                <div className="flex items-center bg-gray-800/50 rounded-xl px-4 py-3 border border-white/10 focus-within:border-rose-500/50 transition-colors">
-                                    <Globe className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" />
-                                    <select
-                                        value={profile.nationality || ''}
-                                        onChange={e => setProfile({ ...profile, nationality: e.target.value })}
-                                        className="w-full appearance-none cursor-pointer focus:outline-none"
-                                        style={{ backgroundColor: 'transparent', color: 'white', border: 'none' }}
-                                    >
-                                        <option value="" style={{ backgroundColor: '#1f2937', color: 'white' }}>Select nationality</option>
-                                        {nationalities.filter(n => n).map(nat => (
-                                            <option key={nat} value={nat} style={{ backgroundColor: '#1f2937', color: 'white' }}>{nat}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
 
-                            {/* Gender */}
-                            <div>
-                                <label className="block text-gray-400 mb-2 text-sm font-medium">Gender</label>
-                                <div className="flex items-center bg-gray-800/50 rounded-xl px-4 py-3 border border-white/10 focus-within:border-rose-500/50 transition-colors">
-                                    <Users className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" />
-                                    <select
-                                        value={profile.gender || ''}
-                                        onChange={e => setProfile({ ...profile, gender: e.target.value })}
-                                        className="w-full appearance-none cursor-pointer focus:outline-none"
-                                        style={{ backgroundColor: 'transparent', color: 'white', border: 'none' }}
-                                    >
-                                        <option value="" style={{ backgroundColor: '#1f2937', color: 'white' }}>Select gender</option>
-                                        <option value="male" style={{ backgroundColor: '#1f2937', color: 'white' }}>Male</option>
-                                        <option value="female" style={{ backgroundColor: '#1f2937', color: 'white' }}>Female</option>
-                                    </select>
-                                </div>
-                            </div>
                         </div>
 
                         <button

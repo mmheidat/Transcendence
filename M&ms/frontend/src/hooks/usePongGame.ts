@@ -17,7 +17,7 @@ export const usePongGame = (
     gameMode: GameMode = '1v1',
     difficulty: 'easy' | 'medium' | 'hard' = 'medium',
     onMatchEnd?: (winner: { side: 'left' | 'right'; name: string }) => void,
-    onlineConfig?: { gameId: string; isHost: boolean }
+    onlineConfig?: { gameId: string; isHost: boolean; player1Name?: string; player2Name?: string }
 ) => {
     const engineRef = useRef<PongEngine | null>(null);
     const requestRef = useRef<number>();
@@ -136,9 +136,11 @@ export const usePongGame = (
                     const winnerName = "You"; // Or user display name if available
 
                     isPlayingRef.current = false;
+                    isPausedRef.current = false; // Ensure pause overlay is removed
                     setGameState(prev => ({
                         ...prev,
                         isPlaying: false,
+                        isPaused: false, // Explicitly unpause
                         winner: { side: mySide, name: 'Opponent Left' } // Special message?
                     }));
                     stopLoop();
@@ -150,7 +152,7 @@ export const usePongGame = (
             // @ts-ignore
             wsClient.on('game_state', handleGameState);
             // @ts-ignore
-            wsClient.on('game_end', handleGameEnd);
+            wsClient.on('game_ended', handleGameEnd);
             // @ts-ignore
             wsClient.on('game_paused', handleGamePause);
             // @ts-ignore
@@ -206,16 +208,25 @@ export const usePongGame = (
         engineRef.current = engine;
     }, [canvasRef, gameMode, difficulty, onlineConfig]);
 
+    const lastTimeRef = useRef<number>(0);
+
     // Game Loop
-    const animate = useCallback(() => {
+    const animate = useCallback((time: number) => {
         if (!isPlayingRef.current) return;
+
+        if (lastTimeRef.current === 0) {
+            lastTimeRef.current = time;
+        }
+
+        const deltaTime = (time - lastTimeRef.current) / 1000;
+        lastTimeRef.current = time;
 
         if (engineRef.current) {
             // Always draw to prevent clearing canvas issues? 
             // Actually, if we want to show the paused state, we should draw.
             // But if paused, we don't update.
             if (!isPausedRef.current) {
-                engineRef.current.update();
+                engineRef.current.update(deltaTime);
             }
             engineRef.current.draw();
         }

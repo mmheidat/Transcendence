@@ -9,6 +9,7 @@ export default defineConfig({
         watch: {
             usePolling: true,
         },
+        allowedHosts: true,
         proxy: {
             '/api': {
                 target: 'https://localhost:8443',

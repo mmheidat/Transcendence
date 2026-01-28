@@ -8,6 +8,7 @@ interface NotificationContextType {
     totalUnread: number;
     markAsRead: (userId: number) => void;
     refreshNotifications: () => Promise<void>;
+    setActiveChatId: (id: number | null) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -15,6 +16,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useAuth();
     const [unreadCounts, setUnreadCounts] = useState<Map<number, number>>(new Map());
+    const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
     // Derived state
     const totalUnread = Array.from(unreadCounts.values()).reduce((sum, count) => sum + count, 0);
@@ -51,6 +53,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             wsClient.connect();
         } else {
             setUnreadCounts(new Map());
+            setActiveChatId(null);
         }
     }, [user]);
 
@@ -61,13 +64,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const handleNewMessage = (payload: any) => {
             // Payload: { type: 'new_message', from: userId, content: ... }
             if (payload && payload.from) {
-                // Determine if we are currently looking at this chat?
-                // Context doesn't know active route. 
-                // Chat page should call markAsRead. 
-                // Context just increments.
-
                 // If the message is from me, ignore (shouldn't happen with correct backend)
                 if (payload.from === user.id) return;
+
+                // If we are currently looking at this chat, ignore
+                if (payload.from === activeChatId) return;
 
                 setUnreadCounts(prev => {
                     const newMap = new Map(prev);
@@ -81,45 +82,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         // @ts-ignore
         wsClient.on('new_message', handleNewMessage);
 
-        // Also listen for legacy 'chat_message' if backend sends that too?
-        // Backend websocket.ts: subscribeToChannel('chat:message') -> sends { type: 'new_message' }
-        // BUT Chat.tsx listens to 'chat_message'?
-        // Wait, did I check websocket.ts correctly?
-        // In websocket.ts:
-        /*
-        subscribeToChannel('chat:message', (message) => {
-             ...
-             client.send(JSON.stringify({
-                type: 'new_message',
-                ...
-             }));
-        */
-        // But Chat.tsx listens to 'chat_message'.
-        // Step 670 Chat.tsx: wsClient.on('chat_message', handleMessage);
-        // Is 'chat_message' ever sent?
-        // Ah, `handleGamePaddleUpdate` uses `game_paddle_update`.
-        // `wsHandler` in websocket.ts sends `aiDelta` etc.
-        // `chatRoutes` (messages.ts) calls `publishEvent('chat:message', ...)`
-        // `wsHandler` subscribes to Redis `chat:message` and forwards as `new_message`!
-
-        // Wait, IF Chat.tsx listens to `chat_message`, and backend sends `new_message`, then Chat.tsx logic IS BROKEN?
-        // Let's re-read Chat.tsx carefully (Step 670).
-        // 107: wsClient.on('chat_message', handleMessage);
-
-        // But backend sends `new_message` (Step 574 line 698).
-        // So Chat functionality might be broken right now for receiving messages live?
-        // Or maybe I missed where `chat_message` is sent.
-        // I should fix Chat.tsx to listen to `new_message` OR fix backend to send `chat_message`.
-
-        // User request is about notifications. If live chat is broken, that's bad.
-        // But if user didn't complain about live chat... maybe they are testing by refresh?
-
-        // I will assume backend sends `new_message` and update `NotificationContext` to listen to `new_message`.
-        // I should also fix Chat.tsx to listen to `new_message` if that's indeed what is sent.
-
+        // Handle potential legacy event just in case
         const handleLegacy = (payload: any) => {
-            // Just in case
-            handleNewMessage({ ...payload, from: payload.senderId || payload.sender_id });
+            // If payload structure is different, normalize it
+            const fromId = payload.senderId || payload.sender_id;
+            if (fromId) {
+                handleNewMessage({ ...payload, from: fromId });
+            }
         }
         // @ts-ignore
         wsClient.on('chat_message', handleLegacy);
@@ -130,10 +99,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             // @ts-ignore
             wsClient.off('chat_message', handleLegacy);
         };
-    }, [user]);
+    }, [user, activeChatId]); // activeChatId dependency is crucial
 
     return (
-        <NotificationContext.Provider value={{ unreadCounts, totalUnread, markAsRead, refreshNotifications }}>
+        <NotificationContext.Provider value={{ unreadCounts, totalUnread, markAsRead, refreshNotifications, setActiveChatId }}>
             {children}
         </NotificationContext.Provider>
     );

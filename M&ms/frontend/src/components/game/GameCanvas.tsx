@@ -10,7 +10,7 @@ interface GameCanvasProps {
     mode: GameMode;
     difficulty?: 'easy' | 'medium' | 'hard';
     onGameEnd?: (winner: { side: 'left' | 'right'; name: string }) => void;
-    onlineConfig?: { gameId: string; isHost: boolean };
+    onlineConfig?: { gameId: string; isHost: boolean; player1Name?: string; player2Name?: string };
 }
 
 const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', onGameEnd, onlineConfig }) => {
@@ -94,7 +94,11 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
                 </div>
 
                 <div className="text-gray-400 font-mono text-sm uppercase tracking-widest">
-                    {mode === 'ai' ? `VS AI (${difficulty})` : mode}
+                    {mode === 'ai' ? `VS AI (${difficulty})` : (
+                        mode === 'online' && onlineConfig
+                            ? `${onlineConfig.player1Name || 'P1'} VS ${onlineConfig.player2Name || 'P2'}`
+                            : mode
+                    )}
                 </div>
 
                 <div className="bg-gray-800/80 px-6 py-2 rounded-lg border border-blue-500/30">
@@ -174,9 +178,21 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
                 {gameState.winner && (
                     <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center backdrop-blur-md z-20 animate-in fade-in duration-300">
                         <h2 className="text-5xl font-bold text-white mb-2">GAME OVER</h2>
-                        <div className="text-3xl text-yellow-400 mb-8 font-bold animate-pulse">
-                            {gameState.winner.name} WINS!
-                        </div>
+                        {mode === 'online' && onlineConfig ? (
+                            (() => {
+                                const isMe = (onlineConfig.isHost && gameState.winner.side === 'left') ||
+                                    (!onlineConfig.isHost && gameState.winner.side === 'right');
+                                return (
+                                    <div className={`text-6xl mb-8 font-black animate-bounce ${isMe ? 'text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.8)]' : 'text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]'}`}>
+                                        {isMe ? 'YOU WIN!' : 'YOU LOSE'}
+                                    </div>
+                                );
+                            })()
+                        ) : (
+                            <div className="text-3xl text-yellow-400 mb-8 font-bold animate-pulse">
+                                {gameState.winner.name} WINS!
+                            </div>
+                        )}
 
                         <div className="flex space-x-4">
                             <button
@@ -207,14 +223,14 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
                 <div className="flex items-center space-x-2">
                     <span className="bg-gray-700 px-2 py-1 rounded text-xs text-white">W</span>
                     <span className="bg-gray-700 px-2 py-1 rounded text-xs text-white">S</span>
-                    <span>Player 1</span>
+                    <span>{onlineConfig?.player1Name || "Player 1"}</span>
                 </div>
 
                 {mode !== 'ai' && (
                     <div className="flex items-center space-x-2">
                         <span className="bg-gray-700 px-2 py-1 rounded text-xs text-white">↑</span>
                         <span className="bg-gray-700 px-2 py-1 rounded text-xs text-white">↓</span>
-                        <span>Player 2</span>
+                        <span>{onlineConfig?.player2Name || "Player 2"}</span>
                     </div>
                 )}
 

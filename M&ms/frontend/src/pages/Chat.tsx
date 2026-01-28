@@ -20,7 +20,7 @@ interface UIMessage {
 const Chat: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { unreadCounts, markAsRead, refreshNotifications } = useNotification();
+    const { unreadCounts, markAsRead, refreshNotifications, setActiveChatId } = useNotification();
     const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
     const [messageInput, setMessageInput] = useState('');
     const [friends, setFriends] = useState<Friend[]>([]);
@@ -54,7 +54,13 @@ const Chat: React.FC = () => {
 
     // Load messages and mark as read when friend selected
     useEffect(() => {
-        if (!selectedFriend) return;
+        if (!selectedFriend) {
+            setActiveChatId(null);
+            return;
+        }
+
+        // Set active chat ID to prevent notifications
+        setActiveChatId(selectedFriend.id);
 
         // Clear notification locally
         markAsRead(selectedFriend.id);
@@ -134,27 +140,52 @@ const Chat: React.FC = () => {
                 if (payload.sender_id === selectedFriend.id) {
                     setMessages(prev => [...prev, newMsg]);
                 }
+            } else if (payload.from && payload.content) {
+                // Handle 'new_message' payload format which uses 'from' instead of 'senderId'
+                const newMsg: UIMessage = {
+                    id: payload.messageId || Date.now(),
+                    sender: selectedFriend.display_name || selectedFriend.username,
+                    text: payload.content,
+                    time: new Date().toLocaleTimeString(),
+                    isMe: false
+                };
+                if (payload.from === selectedFriend.id) {
+                    setMessages(prev => [...prev, newMsg]);
+                }
             }
         };
 
         // @ts-ignore
-        wsClient.on('chat_message', handleMessage);
+        wsClient.on('new_message', handleMessage);
 
         return () => {
             // @ts-ignore
-            wsClient.off('chat_message', handleMessage);
+            wsClient.off('new_message', handleMessage);
         };
     }, [selectedFriend]);
 
-    const handleSearch = async (e: React.FormEvent) => {
+    // Debounced search effect
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (!searchQuery.trim()) {
+                setSearchResults([]);
+                return;
+            }
+
+            try {
+                const results = await socialService.searchUsers(searchQuery);
+                setSearchResults(results);
+            } catch (e) {
+                console.error(e);
+            }
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!searchQuery.trim()) return;
-        try {
-            const results = await socialService.searchUsers(searchQuery);
-            setSearchResults(results);
-        } catch (e) {
-            console.error(e);
-        }
+        // Search is handled by useEffect now
     };
 
     const sendFriendRequest = async (userId: number) => {
@@ -396,6 +427,7 @@ const Chat: React.FC = () => {
                                         <div
                                             key={friend.id}
                                             onClick={() => {
+                                                if (selectedFriend?.id === friend.id) return;
                                                 setSelectedFriend(friend);
                                                 setMessages([]);
                                                 setActiveMenuFriendId(null);
@@ -439,7 +471,7 @@ const Chat: React.FC = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-white font-bold">{selectedFriend.display_name || selectedFriend.username}</h3>
-                                            <p className="text-green-400 text-sm">Online</p>
+                                            <p className={`text-sm ${selectedFriend.is_online ? 'text-green-400' : 'text-gray-400'}`}>{selectedFriend.is_online ? 'Online' : 'Offline'}</p>
                                         </div>
                                     </div>
                                     <div className="flex space-x-2 relative" ref={menuRef}>

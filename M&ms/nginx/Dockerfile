@@ -2,6 +2,7 @@ FROM nginx:alpine
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY locations.conf /etc/nginx/locations.conf
 
 # Copy SSL certificates
 COPY ssl/cert.pem /etc/nginx/ssl/cert.pem

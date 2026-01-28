@@ -10,6 +10,8 @@ const Game: React.FC = () => {
 
     const gameId = searchParams.get('gameId');
     const isHost = searchParams.get('isHost') === 'true';
+    const player1Name = searchParams.get('p1') || 'Player 1';
+    const player2Name = searchParams.get('p2') || 'Player 2';
 
     // Validate mode
     const validModes: GameMode[] = ['ai', '1v1', '2v2', 'online', 'tournament'];
@@ -18,7 +20,7 @@ const Game: React.FC = () => {
     }
 
     const onlineConfig = (mode === 'online' && gameId)
-        ? { gameId, isHost }
+        ? { gameId, isHost, player1Name, player2Name }
         : undefined;
 
     return (

@@ -35,9 +35,10 @@ const InviteHandler: React.FC = () => {
 
         const handleInviteAccepted = (payload: any) => {
             console.log("Invite accepted, starting game:", payload);
-            // Payload: { type: 'game_invite_accepted', game_id: 123, is_host: boolean, opponent_id: ... }
-            const { game_id, is_host, opponent_id } = payload;
-            navigate(`/game?mode=online&gameId=${game_id}&isHost=${is_host}&role=${is_host ? 'host' : 'guest'}`);
+            // Payload: { type: 'game_invite_accepted', game_id: 123, is_host: boolean, opponent_id: ..., player1_name: ..., player2_name: ... }
+            const { game_id, is_host, player1_name, player2_name } = payload;
+
+            navigate(`/game?mode=online&gameId=${game_id}&isHost=${is_host}&p1=${encodeURIComponent(player1_name || 'Player 1')}&p2=${encodeURIComponent(player2_name || 'Player 2')}`);
         };
 
         // @ts-ignore

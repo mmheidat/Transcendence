@@ -61,11 +61,22 @@ class WebSocketClient extends EventEmitter {
     }
 
     reconnect() {
-        if (this.reconnectAttempts > 5) return;
+        if (this.reconnectAttempts > 5 || !this.ws) return; // Don't reconnect if explicitly disconnected (ws is null)
         this.reconnectTimer = window.setTimeout(() => {
             this.reconnectAttempts++;
             this.connect();
         }, 3000);
+    }
+
+    disconnect() {
+        if (this.ws) {
+            console.log('Disconnecting WebSocket...');
+            this.ws.onclose = null; // Prevent reconnection logic from firing
+            this.ws.close();
+            this.ws = null;
+            this.isConnecting = false;
+            this.emit('disconnected', {});
+        }
     }
 
     send(type: string, payload: any) {
@@ -119,14 +130,7 @@ class WebSocketClient extends EventEmitter {
         this.send('game_resume', { game_id: gameId });
     }
 
-    sendGameLeave(gameId: string) {
-        this.send('game_leave', { game_id: gameId });
-    }
-
-    disconnect() {
-        if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
-        this.ws?.close();
-    }
 }
+
 
 export const wsClient = new WebSocketClient();

@@ -26,10 +26,8 @@ export interface UserProfile {
     username: string;
     display_name: string;
     avatar_url?: string;
-    nationality?: string;
     date_of_birth?: string;
     phone?: string;
-    gender?: string;
     is_online: boolean;
     created_at: string;
 }
@@ -89,7 +87,7 @@ class UserService {
                 return leaderboard.map((u, i) => ({
                     rank: i + 1,
                     id: u.id,
-                    username: u.username || u.display_name,
+                    username: u.display_name || u.username,
                     wins: u.wins || 0,
                     avatar: u.avatar_url
                 }));

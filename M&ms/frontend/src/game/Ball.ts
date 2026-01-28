@@ -14,14 +14,14 @@ export class Ball {
     radius: number;
     speedX: number;
     speedY: number;
-    maxSpeed: number = 8;
+    maxSpeed: number = 800; // pixels per second
     isTournament: boolean = false;
 
     // Fire effect properties
     private fireParticles: FireParticle[] = [];
     private fireColors: string[] = ['#ff4500', '#ff6b35', '#ff8c00', '#ffa500', '#ffcc00', '#fff200'];
 
-    constructor(x: number, y: number, radius: number, speedX: number = 3, speedY: number = 3) {
+    constructor(x: number, y: number, radius: number, speedX: number = 200, speedY: number = 200) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -29,15 +29,15 @@ export class Ball {
         this.speedY = speedY;
     }
 
-    move(): void {
+    move(deltaTime: number): void {
         // Add fire particles when moving in tournament mode
         if (this.isTournament) {
             this.addFireParticles();
             this.updateFireParticles();
         }
 
-        this.x += this.speedX;
-        this.y += this.speedY;
+        this.x += this.speedX * deltaTime;
+        this.y += this.speedY * deltaTime;
     }
 
     private addFireParticles(): void {
@@ -130,12 +130,15 @@ export class Ball {
             }
 
             // Optional: Increase speed slightly with each hit (up to a maximum)
-            const maxSpeed = 12;
+            const maxSpeed = 1200; // Increased for time-based speed
             const speedIncrease = 1.05;
             const newSpeed = Math.min(speed * speedIncrease, maxSpeed);
             const currentSpeed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
-            this.speedX = (this.speedX / currentSpeed) * newSpeed;
-            this.speedY = (this.speedY / currentSpeed) * newSpeed;
+
+            if (currentSpeed > 0) {
+                this.speedX = (this.speedX / currentSpeed) * newSpeed;
+                this.speedY = (this.speedY / currentSpeed) * newSpeed;
+            }
         }
     }
 

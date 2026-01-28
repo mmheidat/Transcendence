@@ -48,6 +48,32 @@ const chatRoutes: FastifyPluginAsync = async (fastify) => {
             }
         }
 
+        // Filter out non-friends
+        const partnerIds = Array.from(conversationsMap.keys());
+
+        if (partnerIds.length > 0) {
+            const friendships = await prisma.friend.findMany({
+                where: {
+                    status: 'accepted',
+                    OR: [
+                        { userId: user.id, friendId: { in: partnerIds } },
+                        { userId: { in: partnerIds }, friendId: user.id }
+                    ]
+                }
+            });
+
+            const friendIds = new Set<number>();
+            for (const f of friendships) {
+                friendIds.add(f.userId === user.id ? f.friendId : f.userId);
+            }
+
+            for (const partnerId of partnerIds) {
+                if (!friendIds.has(partnerId)) {
+                    conversationsMap.delete(partnerId);
+                }
+            }
+        }
+
         return reply.send({ conversations: Array.from(conversationsMap.values()) });
     });
 

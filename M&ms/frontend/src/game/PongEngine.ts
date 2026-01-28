@@ -78,23 +78,23 @@ export class PongEngine {
         }
     }
 
-    handleAI(): void {
+    handleAI(deltaTime: number): void {
         if (!this.isAIGame || !this.rightPaddle || !this.ball) return;
 
         const paddleCenter = this.rightPaddle.y + this.rightPaddle.height / 2;
         const ballY = this.ball.y;
         const diff = ballY - paddleCenter;
 
-        // AI speed based on difficulty
+        // AI speed based on difficulty (scaled for pixels/second)
         let aiSpeed = this.rightPaddle.speed;
         if (this.aiDifficulty === 'easy') {
-            aiSpeed = 2;
-            // Add randomness - 30% chance to not move
+            aiSpeed = 150; // Slower than default 400
+            // Add randomness - 30% chance to not move (per frame, might need adjustment for time-based, but ok for now)
             if (Math.random() < 0.3) return;
         } else if (this.aiDifficulty === 'medium') {
-            aiSpeed = 4;
+            aiSpeed = 300;
         } else if (this.aiDifficulty === 'hard') {
-            aiSpeed = 6;
+            aiSpeed = 450; // Faster than player
         }
 
         const originalSpeed = this.rightPaddle.speed;
@@ -102,9 +102,9 @@ export class PongEngine {
 
         if (Math.abs(diff) > 10) {
             if (diff > 0) {
-                this.rightPaddle.move(false, this.canvas.height);
+                this.rightPaddle.move(false, this.canvas.height, deltaTime);
             } else {
-                this.rightPaddle.move(true, this.canvas.height);
+                this.rightPaddle.move(true, this.canvas.height, deltaTime);
             }
         }
 
@@ -158,8 +158,8 @@ export class PongEngine {
                 this.canvas.width / 2,
                 this.canvas.height / 2,
                 10,
-                5, // Faster initial speed
-                5
+                300, // Faster initial speed for 2v2 (pixels/sec)
+                300
             );
         } else {
             // 1v1 or AI mode: 2 paddles
@@ -190,63 +190,84 @@ export class PongEngine {
         }
     }
 
-    handlePaddleMovement(): void {
+    handlePaddleMovement(deltaTime: number): void {
         if (!this.leftPaddle || !this.rightPaddle) return;
 
         if (this.gameMode === '2v2') {
             // 2v2 mode controls
             // Player 1 (left-top): W/S keys
             if (this.keys['w'] || this.keys['W']) {
-                this.leftPaddle.move(true, this.canvas.height);
+                this.leftPaddle.move(true, this.canvas.height, deltaTime);
             }
             if (this.keys['s'] || this.keys['S']) {
-                this.leftPaddle.move(false, this.canvas.height);
+                this.leftPaddle.move(false, this.canvas.height, deltaTime);
             }
 
             // Player 2 (left-bottom): Q/A keys
             if (this.leftPaddle2) {
                 if (this.keys['q'] || this.keys['Q']) {
-                    this.leftPaddle2.move(true, this.canvas.height);
+                    this.leftPaddle2.move(true, this.canvas.height, deltaTime);
                 }
                 if (this.keys['a'] || this.keys['A']) {
-                    this.leftPaddle2.move(false, this.canvas.height);
+                    this.leftPaddle2.move(false, this.canvas.height, deltaTime);
                 }
             }
 
             // Player 3 (right-top): Arrow Up/Down
             if (this.keys['ArrowUp']) {
-                this.rightPaddle.move(true, this.canvas.height);
+                this.rightPaddle.move(true, this.canvas.height, deltaTime);
             }
             if (this.keys['ArrowDown']) {
-                this.rightPaddle.move(false, this.canvas.height);
+                this.rightPaddle.move(false, this.canvas.height, deltaTime);
             }
 
             // Player 4 (right-bottom): O/L keys
             if (this.rightPaddle2) {
                 if (this.keys['o'] || this.keys['O']) {
-                    this.rightPaddle2.move(true, this.canvas.height);
+                    this.rightPaddle2.move(true, this.canvas.height, deltaTime);
                 }
                 if (this.keys['l'] || this.keys['L']) {
-                    this.rightPaddle2.move(false, this.canvas.height);
+                    this.rightPaddle2.move(false, this.canvas.height, deltaTime);
+                }
+            }
+        } else if (this.isOnlineGame) {
+            // Online Mode Restrictions
+            if (this.isHost) {
+                // Host controls Left Paddle (Player 1)
+                // Allow WASD or Arrows for their own paddle for better UX
+                if (this.keys['w'] || this.keys['W'] || this.keys['ArrowUp']) {
+                    this.leftPaddle.move(true, this.canvas.height, deltaTime);
+                }
+                if (this.keys['s'] || this.keys['S'] || this.keys['ArrowDown']) {
+                    this.leftPaddle.move(false, this.canvas.height, deltaTime);
+                }
+            } else {
+                // Guest controls Right Paddle (Player 2)
+                // Allow WASD or Arrows for their own paddle
+                if (this.keys['w'] || this.keys['W'] || this.keys['ArrowUp']) {
+                    this.rightPaddle.move(true, this.canvas.height, deltaTime);
+                }
+                if (this.keys['s'] || this.keys['S'] || this.keys['ArrowDown']) {
+                    this.rightPaddle.move(false, this.canvas.height, deltaTime);
                 }
             }
         } else {
-            // 1v1 or AI mode controls
+            // Local 1v1 or AI mode controls
             // Left paddle controls (W/S)
             if (this.keys['w'] || this.keys['W']) {
-                this.leftPaddle.move(true, this.canvas.height);
+                this.leftPaddle.move(true, this.canvas.height, deltaTime);
             }
             if (this.keys['s'] || this.keys['S']) {
-                this.leftPaddle.move(false, this.canvas.height);
+                this.leftPaddle.move(false, this.canvas.height, deltaTime);
             }
 
             // Right paddle controls (Arrow Up/Down) - only in non-AI mode
             if (!this.isAIGame) {
                 if (this.keys['ArrowUp']) {
-                    this.rightPaddle.move(true, this.canvas.height);
+                    this.rightPaddle.move(true, this.canvas.height, deltaTime);
                 }
                 if (this.keys['ArrowDown']) {
-                    this.rightPaddle.move(false, this.canvas.height);
+                    this.rightPaddle.move(false, this.canvas.height, deltaTime);
                 }
             }
         }
@@ -277,15 +298,15 @@ export class PongEngine {
         if (this.ball) this.ball.draw(this.ctx);
     }
 
-    update(): void {
+    update(deltaTime: number): void {
         if (!this.ball || !this.leftPaddle || !this.rightPaddle) return;
 
-        this.handlePaddleMovement();
+        this.handlePaddleMovement(deltaTime);
 
         // In online mode, only host runs ball physics
         // Guest just receives state updates via applyOnlineState
         if (!this.isOnlineGame || this.isHost) {
-            this.ball.move();
+            this.ball.move(deltaTime);
 
             // Collision detection
             this.ball.detectCollision(this.leftPaddle);
@@ -298,7 +319,7 @@ export class PongEngine {
             }
 
             if (this.isAIGame) {
-                this.handleAI();
+                this.handleAI(deltaTime);
             }
 
             // Ball collision with top/bottom walls

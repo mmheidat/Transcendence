@@ -110,34 +110,37 @@ const Profile: React.FC = () => {
                     <div className="space-y-3">
                         {history.length > 0 ? (
                             history.map((match) => {
-                                const isWinner = match.winner?.id === user?.id;
-                                const opponent = match.player1.id === user?.id ? match.player2 : match.player1;
+                                const isWinner = match.winner?.id === targetUserId;
+                                const amIPlayer1 = match.player1.id === targetUserId;
+                                const opponent = amIPlayer1 ? match.player2 : match.player1;
                                 const isAI = match.game_mode?.startsWith('ai') || !opponent;
-                                const opponentName = isAI ? 'AI' : (opponent?.username || 'Unknown');
+                                const opponentName = isAI ? 'AI' : (opponent?.displayName || opponent?.username || 'Unknown');
 
                                 // Determine score display
                                 const p1Score = match.player1_score;
                                 const p2Score = match.player2_score;
 
-                                // Assuming user is always player1 in history if we query by user? NOTE: backend returns { player1, player2 } fixed
-                                // We need to know which score is ours.
-                                // If user.id == player1.id -> ours is p1Score
-                                const myScore = match.player1.id === user?.id ? p1Score : p2Score;
-                                const oppScore = match.player1.id === user?.id ? p2Score : p1Score;
+                                const myScore = amIPlayer1 ? p1Score : p2Score;
+                                const oppScore = amIPlayer1 ? p2Score : p1Score;
 
-                                const isLeaverLoss = !isWinner && myScore === 0 && oppScore === 11;
-                                const scoreDisplay = isLeaverLoss ? "Leaver Loss" : `${match.player1_score} - ${match.player2_score}`;
+                                // Fallback winner check if winner object/id is missing but scores define a winner (standard 1v1)
+                                const actualIsWinner = isWinner || (myScore > oppScore);
+
+                                const isLeaverLoss = !actualIsWinner && myScore === 0 && oppScore === 11;
+                                const scoreDisplay = `${myScore} - ${oppScore}`;
 
                                 return (
                                     <div key={match.id} className="flex items-center justify-between bg-gray-700/50 p-4 rounded hover:bg-gray-700 transition duration-200 border-l-4 border-transparent hover:border-rose-500">
                                         <div className="flex items-center space-x-4">
-                                            <div className={`w-2 h-2 rounded-full ${isWinner ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <div className={`w-2 h-2 rounded-full ${actualIsWinner ? 'bg-green-500' : 'bg-red-500'}`}></div>
                                             <div>
-                                                <p className="font-bold text-white">{isWinner ? 'Win' : 'Loss'} vs <span className="text-rose-400">{opponentName}</span></p>
+                                                <p className="font-bold text-white">{actualIsWinner ? 'Win' : 'Loss'} vs <span className="text-rose-400">{opponentName}</span></p>
                                                 <p className="text-xs text-gray-500">{new Date(match.played_at).toLocaleString()}</p>
                                             </div>
                                         </div>
-                                        <div className={`text-xl font-mono font-bold ${isLeaverLoss ? 'text-red-500 text-base' : 'text-gray-300'}`}>{scoreDisplay}</div>
+                                        <div className={`text-xl font-mono font-bold ${isLeaverLoss ? 'text-red-500' : 'text-gray-300'}`}>
+                                            {isLeaverLoss ? "Forfeit" : scoreDisplay}
+                                        </div>
                                     </div>
                                 );
                             })

@@ -91,6 +91,10 @@ class AuthService {
     async logout(): Promise<void> {
         if (this.token) {
             try {
+                // Disconnect WebSocket
+                const { wsClient } = await import('../services/socket.service');
+                wsClient.disconnect();
+
                 await fetch(`${API_BASE_URL}/auth/logout`, {
                     method: 'POST',
                     headers: this.getHeaders()
