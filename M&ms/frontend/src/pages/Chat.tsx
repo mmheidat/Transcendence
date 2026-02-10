@@ -114,53 +114,71 @@ const Chat: React.FC = () => {
 
     // Chat message listener - depends on selectedFriend
     useEffect(() => {
-        if (!selectedFriend) return;
-
         const handleMessage = (payload: any) => {
-            if (payload.senderId && payload.content) {
-                const newMsg: UIMessage = {
-                    id: Date.now(),
-                    sender: payload.senderName || 'Unknown',
-                    text: payload.content,
-                    time: new Date().toLocaleTimeString(),
-                    isMe: false
-                };
+            if (selectedFriend) {
+                if (payload.senderId && payload.content) {
+                    const newMsg: UIMessage = {
+                        id: Date.now(),
+                        sender: payload.senderName || 'Unknown',
+                        text: payload.content,
+                        time: new Date().toLocaleTimeString(),
+                        isMe: false
+                    };
 
-                if (payload.senderId === selectedFriend.id) {
-                    setMessages(prev => [...prev, newMsg]);
+                    if (payload.senderId === selectedFriend.id) {
+                        setMessages(prev => [...prev, newMsg]);
+                    }
+                } else if (payload.message && payload.sender_id) {
+                    const newMsg: UIMessage = {
+                        id: payload.message.id || Date.now(),
+                        sender: 'Unknown',
+                        text: payload.message.content,
+                        time: new Date(payload.message.sent_at).toLocaleTimeString(),
+                        isMe: false
+                    };
+                    if (payload.sender_id === selectedFriend.id) {
+                        setMessages(prev => [...prev, newMsg]);
+                    }
+                } else if (payload.from && payload.content) {
+                    // Handle 'new_message' payload format which uses 'from' instead of 'senderId'
+                    const newMsg: UIMessage = {
+                        id: payload.messageId || Date.now(),
+                        sender: selectedFriend.display_name || selectedFriend.username,
+                        text: payload.content,
+                        time: new Date().toLocaleTimeString(),
+                        isMe: false
+                    };
+                    if (payload.from === selectedFriend.id) {
+                        setMessages(prev => [...prev, newMsg]);
+                    }
                 }
-            } else if (payload.message && payload.sender_id) {
-                const newMsg: UIMessage = {
-                    id: payload.message.id || Date.now(),
-                    sender: 'Unknown',
-                    text: payload.message.content,
-                    time: new Date(payload.message.sent_at).toLocaleTimeString(),
-                    isMe: false
-                };
-                if (payload.sender_id === selectedFriend.id) {
-                    setMessages(prev => [...prev, newMsg]);
-                }
-            } else if (payload.from && payload.content) {
-                // Handle 'new_message' payload format which uses 'from' instead of 'senderId'
-                const newMsg: UIMessage = {
-                    id: payload.messageId || Date.now(),
-                    sender: selectedFriend.display_name || selectedFriend.username,
-                    text: payload.content,
-                    time: new Date().toLocaleTimeString(),
-                    isMe: false
-                };
-                if (payload.from === selectedFriend.id) {
-                    setMessages(prev => [...prev, newMsg]);
-                }
+            }
+        };
+
+        const handleFriendStatus = (payload: any) => {
+            const { userId, isOnline } = payload;
+
+            // Update friends list
+            setFriends(prev => prev.map(f =>
+                f.id === userId ? { ...f, is_online: isOnline } : f
+            ));
+
+            // Update selected friend if applicable
+            if (selectedFriend && selectedFriend.id === userId) {
+                setSelectedFriend(prev => prev ? { ...prev, is_online: isOnline } : null);
             }
         };
 
         // @ts-ignore
         wsClient.on('new_message', handleMessage);
+        // @ts-ignore
+        wsClient.on('friend_status', handleFriendStatus);
 
         return () => {
             // @ts-ignore
             wsClient.off('new_message', handleMessage);
+            // @ts-ignore
+            wsClient.off('friend_status', handleFriendStatus);
         };
     }, [selectedFriend]);
 

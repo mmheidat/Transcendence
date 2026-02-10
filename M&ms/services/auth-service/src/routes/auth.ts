@@ -19,6 +19,13 @@ const loginSchema = z.object({
     password: z.string()
 });
 
+// Helper to derive the origin from the incoming request
+function getRequestOrigin(request: any): string {
+    const proto = request.headers['x-forwarded-proto'] || 'https';
+    const host = request.headers['x-forwarded-host'] || request.headers['host'] || 'localhost:8443';
+    return `${proto}://${host}`;
+}
+
 const googleOAuthConfig = {
     name: 'googleOAuth2',
     credentials: {
@@ -34,7 +41,7 @@ const googleOAuthConfig = {
         }
     },
     startRedirectPath: '/api/auth/google',
-    callbackUri: process.env.GOOGLE_REDIRECT_URI || 'https://localhost:8443/api/auth/google/callback',
+    callbackUri: (request: any) => `${getRequestOrigin(request)}/api/auth/google/callback`,
     scope: ['email', 'profile']
 };
 
@@ -182,7 +189,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
             const result = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
             if (!result?.token?.access_token) {
-                const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
+                const frontendUrl = getRequestOrigin(request);
                 return reply.redirect(`${frontendUrl}?message=Failed to get access token`);
             }
 
@@ -192,7 +199,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
             );
 
             if (!googleUser.verified_email) {
-                const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
+                const frontendUrl = getRequestOrigin(request);
                 return reply.redirect(`${frontendUrl}?message=Email not verified`);
             }
 
@@ -242,12 +249,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
             const token = fastify.jwt.sign({ id: user.id, email: user.email, username: user.username });
 
-            const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
+            const frontendUrl = getRequestOrigin(request);
             return reply.redirect(`${frontendUrl}?token=${token}`);
 
         } catch (error) {
             console.error('OAuth callback error:', error);
-            const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
+            const frontendUrl = getRequestOrigin(request);
             return reply.redirect(`${frontendUrl}?message=Authentication failed`);
         }
     });

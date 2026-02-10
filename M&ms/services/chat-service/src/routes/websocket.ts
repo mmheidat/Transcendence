@@ -13,6 +13,41 @@ const activeStreams = new Map<string, AbortController>();
 // Rate limiter state
 const rateLimitState = new Map<string, { count: number; resetAt: number }>();
 
+// Broadcast status to friends
+async function broadcastStatus(userId: number, isOnline: boolean) {
+    try {
+        // 1. Find all friends where status is 'accepted'
+        // We need to check both directions: where userId is requester OR recipient
+        const friends = await prisma.friend.findMany({
+            where: {
+                OR: [
+                    { userId: userId, status: 'accepted' },
+                    { friendId: userId, status: 'accepted' }
+                ]
+            }
+        });
+
+        // 2. Extract friend IDs
+        const friendIds = friends.map(f => f.userId === userId ? f.friendId : f.userId);
+
+        // 3. Send status update to connected friends
+        for (const fid of friendIds) {
+            const friendSockets = clients.get(fid);
+            if (friendSockets) {
+                for (const socket of friendSockets) {
+                    socket.send(JSON.stringify({
+                        type: 'friend_status',
+                        userId,
+                        isOnline
+                    }));
+                }
+            }
+        }
+    } catch (e) {
+        console.error(`Failed to broadcast status for user ${userId}`, e);
+    }
+}
+
 function checkRateLimit(userId: number): { allowed: boolean; retryAfter?: number } {
     const key = `user:${userId}`;
     const now = Date.now();
@@ -64,6 +99,9 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
         } catch (e) {
             console.error(`Failed to update user ${userId} status to online`, e);
         }
+
+        // Broadcast online status
+        broadcastStatus(userId, true);
 
         // Register client - use connection.socket for the underlying WebSocket
         if (!clients.has(userId)) {
@@ -167,6 +205,9 @@ const wsHandler: FastifyPluginAsync = async (fastify) => {
                 } catch (e) {
                     console.error(`Failed to update user ${userId} status to offline`, e);
                 }
+
+                // Broadcast offline status
+                broadcastStatus(userId, false);
             }
 
             // Check if this specific socket was in an active game and forfeit it

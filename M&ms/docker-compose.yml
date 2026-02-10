@@ -56,6 +56,10 @@ services:
     environment:
       - PORT=3001
       - REDIS_URL=redis://redis:6379
+      - NODE_OPTIONS=--dns-result-order=ipv4first
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     depends_on:
       - redis
     restart: unless-stopped
@@ -133,6 +137,7 @@ services:
       - AI_REQUEST_TIMEOUT_MS=${AI_REQUEST_TIMEOUT_MS:-30000}
       - AI_RATE_LIMIT_MAX=${AI_RATE_LIMIT_MAX:-10}
       - AI_RATE_LIMIT_WINDOW=${AI_RATE_LIMIT_WINDOW:-300000}
+      - NODE_OPTIONS=--dns-result-order=ipv4first
     depends_on:
       - redis
     restart: unless-stopped

@@ -18,7 +18,7 @@ const fastify = Fastify({
 });
 
 await fastify.register(cors, {
-    origin: process.env.FRONTEND_URL || 'https://localhost:8443',
+    origin: true,
     credentials: true
 });
 
