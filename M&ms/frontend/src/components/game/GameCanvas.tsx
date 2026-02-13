@@ -239,7 +239,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
                 )}
 
                 <div className="flex items-center space-x-2">
-                    <span className="bg-gray-700 px-2 py-1 rounded text-xs text-white">ESC</span>
+                    <span className="bg-gray-700 px-2 py-1 rounded text-xs text-white">P</span>
                     <span>Pause</span>
                 </div>
             </div>
