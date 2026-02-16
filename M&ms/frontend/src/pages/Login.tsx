@@ -15,14 +15,11 @@ const Login: React.FC = () => {
     const [searchParams] = useSearchParams();
 
     // Handle Google OAuth 2FA redirect: ?requires2fa=true&token=<partial>
+    // Token is already stored by AuthContext, just show the 2FA form
     useEffect(() => {
         const requires2fa = searchParams.get('requires2fa');
-        const token = searchParams.get('token');
-        if (requires2fa === 'true' && token) {
-            authService.setToken(token);
+        if (requires2fa === 'true') {
             setShow2FA(true);
-            // Clean the URL
-            window.history.replaceState({}, '', '/login');
         }
     }, [searchParams]);
 

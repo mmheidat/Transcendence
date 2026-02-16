@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { authService, User } from '../services/auth.service';
 
 interface AuthContextType {
@@ -16,6 +16,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Capture URL params at render time, BEFORE any child effects can modify the URL
+    const initialUrlParams = useRef(new URLSearchParams(window.location.search));
+
     const refreshUser = async () => {
         try {
             const userData = await authService.fetchCurrentUser();
@@ -30,20 +33,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     useEffect(() => {
-        // Check for URL params (OAuth callback)
-        const urlParams = new URLSearchParams(window.location.search);
+        // Use the params captured at render time (safe from child effect race conditions)
+        const urlParams = initialUrlParams.current;
         const urlToken = urlParams.get('token');
-        const urlError = urlParams.get('message'); // Backend sends error in 'message' param
+        const urlError = urlParams.get('message');
         const requires2fa = urlParams.get('requires2fa');
 
         if (urlError) {
             console.error("Auth Error:", urlError);
             alert(`Authentication failed: ${urlError}`);
-            window.history.replaceState({}, '', '/login'); // Clear URL
+            window.history.replaceState({}, '', '/login');
         }
 
-        // If 2FA is required, don't auto-login — let Login.tsx handle it
+        // If 2FA is required, store the partial token and let Login.tsx handle the UI
         if (requires2fa === 'true') {
+            // Clear any old session token first
+            authService.clearToken();
+            // Store the new partial token for the 2FA flow
+            if (urlToken) {
+                authService.setToken(urlToken);
+            }
+            // Clean the URL
+            window.history.replaceState({}, '', '/login');
             setIsLoading(false);
             return;
         }
