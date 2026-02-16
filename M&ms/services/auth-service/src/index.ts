@@ -1,3 +1,9 @@
+//Loading environment variables
+//Creating the Fastify server
+//Registering security plugins (CORS, Cookies, JWT)
+//Registering authentication routes
+//Starting the server
+//Handling graceful shutdown
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
@@ -16,12 +22,13 @@ const PORT = parseInt(process.env.PORT || '3001');
 const fastify = Fastify({
     logger: true
 });
-
+//plugin for cros
 await fastify.register(cors, {
     origin: true,
     credentials: true
 });
 
+//plugin for cookie
 await fastify.register(cookie);
 
 await registerJwt(fastify);

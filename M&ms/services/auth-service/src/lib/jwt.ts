@@ -1,6 +1,7 @@
 // Force reload
+// plugin for jwt (plugin = feature)
 import jwt from '@fastify/jwt';
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'; //configuration
 
 export async function registerJwt(fastify: FastifyInstance): Promise<void> {
     await fastify.register(jwt, {
