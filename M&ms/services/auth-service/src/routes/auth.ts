@@ -1,7 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import oauthPlugin from '@fastify/oauth2';
 import axios from 'axios';
 import prisma from '../lib/prisma.js';
 import { authenticate, JwtPayload } from '../lib/authMiddleware.js';
@@ -26,23 +25,8 @@ function getRequestOrigin(request: any): string {
     return `${proto}://${host}`;
 }
 
-const googleOAuthConfig = {
-    name: 'googleOAuth2',
-    credentials: {
-        client: {
-            id: process.env.GOOGLE_CLIENT_ID!,
-            secret: process.env.GOOGLE_CLIENT_SECRET!
-        },
-        auth: {
-            authorizeHost: 'https://accounts.google.com',
-            authorizePath: '/o/oauth2/v2/auth',
-            tokenHost: 'https://oauth2.googleapis.com',
-            tokenPath: '/token'
-        }
-    },
-    callbackUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8080/api/auth/google/callback',
-    scope: ['email', 'profile']
-};
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 
 interface GoogleUserInfo {
     id: string;
@@ -53,10 +37,8 @@ interface GoogleUserInfo {
 }
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
-    // Register OAuth plugin
-    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-        await fastify.register(oauthPlugin, googleOAuthConfig);
-        console.log('✅ OAuth plugin registered');
+    if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
+        console.log('✅ Google OAuth configured (manual flow)');
     }
 
     // Register
@@ -171,10 +153,27 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         }
     });
 
-    // Google OAuth start
+    // Google OAuth start — dynamically builds the redirect_uri from the request origin
     fastify.get('/google', async (request, reply) => {
         try {
-            const authUrl = await fastify.googleOAuth2.generateAuthorizationUri(request, reply);
+            const origin = getRequestOrigin(request);
+            const redirectUri = `${origin}/api/auth/google/callback`;
+
+            // Encode the origin in the state so the callback knows where to redirect
+            const state = Buffer.from(JSON.stringify({ origin })).toString('base64url');
+
+            const params = new URLSearchParams({
+                client_id: GOOGLE_CLIENT_ID,
+                redirect_uri: redirectUri,
+                response_type: 'code',
+                scope: 'email profile',
+                state,
+                access_type: 'online',
+                prompt: 'select_account'
+            });
+
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+            console.log(`🔑 OAuth redirect_uri: ${redirectUri}`);
             return reply.redirect(authUrl);
         } catch (error) {
             console.error('OAuth init error:', error);
@@ -182,24 +181,52 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         }
     });
 
-    // Google OAuth callback
+    // Google OAuth callback — extracts origin from state to redirect correctly
     fastify.get('/google/callback', async (request, reply) => {
         try {
-            const result = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
+            const query = request.query as { code?: string; state?: string; error?: string };
 
-            if (!result?.token?.access_token) {
-                const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
-                return reply.redirect(`${frontendUrl}?message=Failed to get access token`);
+            // Parse origin from state parameter
+            let origin = process.env.FRONTEND_URL || 'https://localhost:8443';
+            if (query.state) {
+                try {
+                    const stateData = JSON.parse(Buffer.from(query.state, 'base64url').toString());
+                    if (stateData.origin) {
+                        origin = stateData.origin;
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse OAuth state, using default origin');
+                }
+            }
+
+            if (query.error || !query.code) {
+                return reply.redirect(`${origin}?message=${query.error || 'OAuth failed'}`);
+            }
+
+            // Build the same redirect_uri that was used in the authorization request
+            const redirectUri = `${origin}/api/auth/google/callback`;
+
+            // Exchange authorization code for access token
+            const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+                code: query.code,
+                client_id: GOOGLE_CLIENT_ID,
+                client_secret: GOOGLE_CLIENT_SECRET,
+                redirect_uri: redirectUri,
+                grant_type: 'authorization_code'
+            });
+
+            const accessToken = tokenResponse.data?.access_token;
+            if (!accessToken) {
+                return reply.redirect(`${origin}?message=Failed to get access token`);
             }
 
             const { data: googleUser } = await axios.get<GoogleUserInfo>(
                 'https://www.googleapis.com/oauth2/v2/userinfo',
-                { headers: { Authorization: `Bearer ${result.token.access_token}` } }
+                { headers: { Authorization: `Bearer ${accessToken}` } }
             );
 
             if (!googleUser.verified_email) {
-                const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
-                return reply.redirect(`${frontendUrl}?message=Email not verified`);
+                return reply.redirect(`${origin}?message=Email not verified`);
             }
 
             let user = await prisma.user.findFirst({
@@ -231,7 +258,6 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
                 }
             } else {
                 // Only update avatar if user doesn't have a custom one already
-                // This preserves any custom avatar the user has uploaded
                 const currentUser = await prisma.user.findUnique({ where: { id: user.id }, select: { avatarUrl: true } });
                 if (!currentUser?.avatarUrl) {
                     await prisma.user.update({
@@ -246,15 +272,33 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
                 data: { isOnline: true, lastSeen: new Date() }
             });
 
+            // Check if user has 2FA enabled — if so, issue a partial token and redirect to 2FA
+            if (user.isTwoFactorEnabled) {
+                const partialToken = fastify.jwt.sign({
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    isPartial: true
+                });
+                return reply.redirect(`${origin}/login?requires2fa=true&token=${partialToken}`);
+            }
+
             const token = fastify.jwt.sign({ id: user.id, email: user.email, username: user.username });
 
-            const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
-            return reply.redirect(`${frontendUrl}?token=${token}`);
+            return reply.redirect(`${origin}?token=${token}`);
 
         } catch (error) {
             console.error('OAuth callback error:', error);
-            const frontendUrl = process.env.FRONTEND_URL || 'https://localhost:8443';
-            return reply.redirect(`${frontendUrl}?message=Authentication failed`);
+            // Try to extract origin from state even on error
+            let origin = process.env.FRONTEND_URL || 'https://localhost:8443';
+            try {
+                const query = request.query as { state?: string };
+                if (query.state) {
+                    const stateData = JSON.parse(Buffer.from(query.state, 'base64url').toString());
+                    if (stateData.origin) origin = stateData.origin;
+                }
+            } catch (_) { }
+            return reply.redirect(`${origin}?message=Authentication failed`);
         }
     });
 

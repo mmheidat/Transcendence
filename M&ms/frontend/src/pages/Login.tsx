@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/auth.service';
 
@@ -12,6 +12,19 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    // Handle Google OAuth 2FA redirect: ?requires2fa=true&token=<partial>
+    useEffect(() => {
+        const requires2fa = searchParams.get('requires2fa');
+        const token = searchParams.get('token');
+        if (requires2fa === 'true' && token) {
+            authService.setToken(token);
+            setShow2FA(true);
+            // Clean the URL
+            window.history.replaceState({}, '', '/login');
+        }
+    }, [searchParams]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -118,7 +131,7 @@ const Login: React.FC = () => {
 
                         <button
                             type="button"
-                            onClick={() => { setShow2FA(false); setTwoFactorCode(''); setError(null); }}
+                            onClick={() => { setShow2FA(false); setTwoFactorCode(''); setError(null); authService.clearToken(); }}
                             className="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-lg transition duration-300"
                         >
                             Back to Login

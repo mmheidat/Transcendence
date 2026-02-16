@@ -34,11 +34,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const urlParams = new URLSearchParams(window.location.search);
         const urlToken = urlParams.get('token');
         const urlError = urlParams.get('message'); // Backend sends error in 'message' param
+        const requires2fa = urlParams.get('requires2fa');
 
         if (urlError) {
             console.error("Auth Error:", urlError);
             alert(`Authentication failed: ${urlError}`);
             window.history.replaceState({}, '', '/login'); // Clear URL
+        }
+
+        // If 2FA is required, don't auto-login — let Login.tsx handle it
+        if (requires2fa === 'true') {
+            setIsLoading(false);
+            return;
         }
 
         if (urlToken) {
