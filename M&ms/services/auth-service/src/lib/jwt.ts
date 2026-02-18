@@ -1,11 +1,7 @@
 // Force reload
 // plugin for jwt (plugin = feature)
 import jwt from '@fastify/jwt';
-<<<<<<< HEAD
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'; //configuration
-=======
-import { FastifyInstance } from 'fastify';
->>>>>>> sogno_di_volare
 
 // Register JWT plugin for Fastify.
 // 1) Registers @fastify/jwt so request.jwtVerify() / fastify.jwt.sign() become available

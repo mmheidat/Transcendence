@@ -46,19 +46,8 @@ interface GoogleUserInfo {
 // 3) Uses Prisma for persistence, bcrypt for password checks, JWT for sessions.
 // 4) Publishes user events to Redis for other services (created/login/logout).
 const authRoutes: FastifyPluginAsync = async (fastify) => {
-<<<<<<< HEAD
     if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
         console.log('✅ Google OAuth configured (manual flow)');
-=======
-    // OAuth plugin registration.
-    // 1) Checks GOOGLE_CLIENT_ID/SECRET presence to avoid misconfigured startup.
-    // 2) Registers @fastify/oauth2 with Google config.
-    // 3) Enables fastify.googleOAuth2 helper methods on the instance.
-    // 4) Logs successful registration for visibility.
-    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-        await fastify.register(oauthPlugin, googleOAuthConfig);
-        console.log('✅ OAuth plugin registered');
->>>>>>> sogno_di_volare
     }
 
     // POST /register: create a local account and issue JWT.
@@ -180,15 +169,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         }
     });
 
-<<<<<<< HEAD
     // Google OAuth start — dynamically builds the redirect_uri from the request origin
-=======
-    // GET /google: start Google OAuth flow.
-    // 1) Derives the caller origin (to redirect back to correct frontend).
-    // 2) Stores origin in an httpOnly cookie for the callback step.
-    // 3) Generates Google authorization URL via fastify.googleOAuth2.
-    // 4) Redirects the user agent to Google consent screen.
->>>>>>> sogno_di_volare
     fastify.get('/google', async (request, reply) => {
         try {
             const origin = getRequestOrigin(request);
@@ -216,15 +197,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         }
     });
 
-<<<<<<< HEAD
     // Google OAuth callback — extracts origin from state to redirect correctly
-=======
-    // GET /google/callback: finalize Google OAuth and issue JWT.
-    // 1) Exchanges authorization code for access token.
-    // 2) Fetches Google user profile (userinfo) and checks verified_email.
-    // 3) Finds or creates/links a local user record (by oauthId or email).
-    // 4) Marks user online, signs JWT, and redirects back to frontend with token.
->>>>>>> sogno_di_volare
     fastify.get('/google/callback', async (request, reply) => {
         try {
             const query = request.query as { code?: string; state?: string; error?: string };
@@ -300,15 +273,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
                     await publishEvent('user:created', { userId: user.id, username: user.username });
                 }
             } else {
-<<<<<<< HEAD
                 // Only update avatar if user doesn't have a custom one already
-=======
-                // Avatar update policy.
-                // 1) Fetches current avatar from DB.
-                // 2) Updates avatar only if none is set (keeps user-uploaded custom avatar).
-                // 3) Prevents overwriting existing custom avatar on repeated OAuth logins.
-                // 4) Uses Google picture URL as default avatar source.
->>>>>>> sogno_di_volare
                 const currentUser = await prisma.user.findUnique({ where: { id: user.id }, select: { avatarUrl: true } });
                 if (!currentUser?.avatarUrl) {
                     await prisma.user.update({

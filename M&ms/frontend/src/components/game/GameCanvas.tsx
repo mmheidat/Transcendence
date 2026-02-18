@@ -81,7 +81,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ mode, difficulty = 'medium', on
         } finally {
             setIsLeaving(false);
             setShowLeaveConfirm(false);
-            navigate('/play');
+            navigate('/play', { replace: true });
         }
     };
 
