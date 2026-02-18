@@ -18,12 +18,20 @@ const loginSchema = z.object({
     password: z.string()
 });
 
-// getRequestOrigin: derive frontend origin from proxy headers.
-// 1) Reads x-forwarded-proto / x-forwarded-host (or host) from request headers.
-// 2) Falls back to 'https' and 'localhost:8443' if headers are missing.
-// 3) Builds a proto://host origin string.
-// 4) Used to redirect back to the correct frontend after OAuth.
+// getRequestOrigin: derive frontend origin for OAuth redirects.
+// 1) Extracts origin from GOOGLE_REDIRECT_URI env variable if available.
+// 2) Falls back to X-Forwarded headers from the proxy.
+// 3) Docker maps external 8443→internal 443, so nginx loses the external port
+//    in forwarded headers — using the env variable is more reliable.
 function getRequestOrigin(request: any): string {
+    // Prefer the origin from GOOGLE_REDIRECT_URI since proxy headers lose the external port
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+    if (redirectUri) {
+        try {
+            const url = new URL(redirectUri);
+            return url.origin;
+        } catch (_) { }
+    }
     const proto = request.headers['x-forwarded-proto'] || 'https';
     const host = request.headers['x-forwarded-host'] || request.headers['host'] || 'localhost:8443';
     return `${proto}://${host}`;
