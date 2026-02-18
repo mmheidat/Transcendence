@@ -1,4 +1,3 @@
-
 import { FastifyInstance } from 'fastify';
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
@@ -10,17 +9,25 @@ const codeSchema = z.object({
     code: z.string().length(6)
 });
 
+// twoFactorRoutes: 2FA endpoints (setup/enable/verify/disable/status).
+// 1) Exposes routes to generate TOTP secret + QR, enable 2FA, and verify 2FA during login.
+// 2) Uses Prisma to store the TOTP secret and 2FA enabled flag.
+// 3) Uses authenticate for fully-authenticated actions and authenticatePre2FA for the login 2FA step.
+// 4) Issues a full JWT after successful 2FA verification.
 export default async function twoFactorRoutes(fastify: FastifyInstance) {
-    // Generate Secret & QR Code
+    // POST /generate: generate TOTP secret and QR code for the authenticator app.
+    // 1) Requires full JWT via authenticate.
+    // 2) Generates a new TOTP secret and otpauth URI for the user.
+    // 3) Stores the secret in DB (setup initiated, not enabled yet).
+    // 4) Returns the secret and a QR code (data URL) for scanning.
     fastify.post('/generate', { preHandler: [authenticate] }, async (request, reply) => {
         const user = request.user as JwtPayload;
         const secret = authenticator.generateSecret();
         const otpauth = authenticator.keyuri(user.email, 'Pong42', secret);
 
-        // Store secret temporarily but don't enable yet
         await prisma.user.update({
             where: { id: user.id },
-            data: { twoFactorSecret: secret } // Encrypting this would be better practice, but storing plain for now as per "simple" requirement
+            data: { twoFactorSecret: secret }
         });
 
         try {
@@ -32,7 +39,11 @@ export default async function twoFactorRoutes(fastify: FastifyInstance) {
         }
     });
 
-    // Verify and Turn On
+    // POST /turn-on: verify code and enable 2FA.
+    // 1) Requires full JWT via authenticate.
+    // 2) Validates request body format (6-digit code).
+    // 3) Loads user + stored secret and verifies the provided TOTP code.
+    // 4) If valid, sets isTwoFactorEnabled=true in DB and returns success.
     fastify.post('/turn-on', { preHandler: [authenticate] }, async (request, reply) => {
         const user = request.user as JwtPayload;
         const body = codeSchema.safeParse(request.body);
@@ -59,7 +70,11 @@ export default async function twoFactorRoutes(fastify: FastifyInstance) {
         return { message: '2FA enabled successfully' };
     });
 
-    // Validate (Login 2FA step)
+    // POST /authenticate: verify 2FA code during login and issue full JWT.
+    // 1) Requires JWT via authenticatePre2FA (allows isPartial tokens).
+    // 2) Validates request body format (6-digit code).
+    // 3) Ensures 2FA is enabled + secret exists, then verifies the provided TOTP code.
+    // 4) If valid, signs and returns a full JWT without isPartial.
     fastify.post('/authenticate', { preHandler: [authenticatePre2FA] }, async (request, reply) => {
         const userToken = request.user as JwtPayload;
         const body = codeSchema.safeParse(request.body);
@@ -78,12 +93,11 @@ export default async function twoFactorRoutes(fastify: FastifyInstance) {
             return reply.code(401).send({ error: 'Invalid code' });
         }
 
-        // Issue full token
         const token = fastify.jwt.sign({
             id: dbUser.id,
             email: dbUser.email,
             username: dbUser.username
-        }); // No isPartial flag
+        });
 
         return {
             token,
@@ -96,7 +110,11 @@ export default async function twoFactorRoutes(fastify: FastifyInstance) {
         };
     });
 
-    // Disable 2FA
+    // POST /turn-off: disable 2FA and clear secret.
+    // 1) Requires full JWT via authenticate.
+    // 2) Reads user id from request.user.
+    // 3) Sets isTwoFactorEnabled=false and removes stored secret in DB.
+    // 4) Returns success message.
     fastify.post('/turn-off', { preHandler: [authenticate] }, async (request, reply) => {
         const user = request.user as JwtPayload;
 
@@ -108,7 +126,11 @@ export default async function twoFactorRoutes(fastify: FastifyInstance) {
         return { message: '2FA disabled successfully' };
     });
 
-    // Check status
+    // GET /status: return whether 2FA is enabled for current user.
+    // 1) Requires full JWT via authenticate.
+    // 2) Loads user record from DB by token user id.
+    // 3) Returns { enabled: boolean } based on isTwoFactorEnabled.
+    // 4) Defaults to false if user is missing.
     fastify.get('/status', { preHandler: [authenticate] }, async (request, reply) => {
         const userToken = request.user as JwtPayload;
         const user = await prisma.user.findUnique({ where: { id: userToken.id } });

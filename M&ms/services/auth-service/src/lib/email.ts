@@ -13,11 +13,18 @@ const transporter = nodemailer.createTransport({
 });
 
 // Generate verification token
+// 1) Generates a cryptographically strong random token
+// 2) Uses 32 random bytes 
+// 3) Encodes the token as a hex string
 export function generateVerificationToken(): string {
     return crypto.randomBytes(32).toString('hex');
 }
 
-// Generate token expiry (24 hours from now)
+// Generate token expiry
+// 1) Creates a Date object for "now".
+// 2) Adds 24 hours to it.
+// 3) Returns the resulting expiry Date.
+// 4) Intended to be stored alongside the token for expiration checks.
 export function generateTokenExpiry(): Date {
     const expiry = new Date();
     expiry.setHours(expiry.getHours() + 24);
@@ -25,6 +32,10 @@ export function generateTokenExpiry(): Date {
 }
 
 // Send verification email
+// 1) Builds a frontend verification URL
+// 2) Prepares an HTML email template
+// 3) Sends the email via the configured Nodemailer transporter
+// 4) Returns true on success, false on failure
 export async function sendVerificationEmail(
     email: string,
     token: string,
@@ -86,6 +97,10 @@ export async function sendVerificationEmail(
 }
 
 // Verify the transporter connection
+// 1) Checks that the transporter can connect or authenticate with the SMTP server
+// 2) Useful during health checks to fail fast on misconfiguration
+// 3) Returns true if the SMTP(Simple Mail Transfer Protocol) configuration works.
+// 4) Returns false if verification fails.
 export async function verifyEmailConnection(): Promise<boolean> {
     try {
         await transporter.verify();
