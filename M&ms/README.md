@@ -63,9 +63,9 @@ A modern, full-stack multiplayer Pong game built as a single-page web applicatio
 
 | Member | 42 Login | Role(s) | Responsibilities |
 |--------|----------|---------|------------------|
-| **Abu Hamood Mheidat** | `mmheidat` | Project Owner / Tech Lead / Full Stack Developer | Project vision, architecture design, full-stack development, AI integration, DevOps |
+| **Mohammad Mheidat** | `mmheidat` | Project Owner / Tech Lead / Full Stack Developer | Project vision, architecture design, full-stack development, AI integration, DevOps |
 | **Maeen Bamatraf** | `mbamatra` | Frontend Specialist / Developer | UI/UX design, React components, responsive design, frontend routing |
-| **Al sherif Alsherif** | `malsheri` | Backend Architect / Developer | Backend API design, microservice architecture, database schema, game logic |
+| **Mohamed Alsherif** | `malsheri` | Backend Architect / Developer | Backend API design, microservice architecture, database schema, game logic |
 | **Reem Ali** | `reeali` | Security Engineer / Developer | Authentication system, OAuth integration, 2FA implementation, security |
 | **Ruslan Nartdinov** | `rnartdin` | Game Developer | Pong engine, game physics, canvas rendering, multiplayer sync |
 
@@ -312,7 +312,7 @@ https://localhost:8443
 
 ## 🧑‍💻 Individual Contributions
 
-### Abu Hamood Mheidat (`mmheidat`) — Project Owner / Tech Lead
+### Mohammad Mheidat (`mmheidat`) — Project Owner / Tech Lead
 - Designed the overall microservices architecture and Docker setup
 - Implemented the WebSocket infrastructure (game sync, chat, invites)
 - Built the AI assistant integration (Groq + LangChain)
@@ -328,7 +328,7 @@ https://localhost:8443
 - Created the "Meet the Devs" showcase page
 - **Challenges**: Managing complex state in the chat component with real-time updates; responsive canvas scaling for the Pong game
 
-### Al sherif Alsherif (`malsheri`) — Backend Architect
+### Mohamed Alsherif (`malsheri`) — Backend Architect
 - Architected the RESTful API endpoints across all services
 - Designed the Prisma database schema and relationships
 - Implemented game history, leaderboard queries, and user stats
