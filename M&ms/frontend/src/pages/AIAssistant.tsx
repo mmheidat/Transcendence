@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Plus, MessageSquare } from 'lucide-react';
+import { Send, Bot, User, Plus, MessageSquare, X } from 'lucide-react';
 import { aiService, AiConversation, AiMessage } from '../services/ai.service';
 
 const AIAssistant: React.FC = () => {
@@ -9,6 +9,7 @@ const AIAssistant: React.FC = () => {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         loadConversations();
@@ -21,7 +22,9 @@ const AIAssistant: React.FC = () => {
     }, [currentConversation]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messages.length > 0 && messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [messages]);
 
     const loadConversations = async () => {
@@ -52,6 +55,20 @@ const AIAssistant: React.FC = () => {
             setMessages([]);
         } catch (e) {
             console.error(e);
+        }
+    };
+
+    const handleDeleteConversation = async (convId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            await aiService.deleteConversation(convId);
+            setConversations(prev => prev.filter(c => c.id !== convId));
+            if (currentConversation?.id === convId) {
+                setCurrentConversation(null);
+                setMessages([]);
+            }
+        } catch (err) {
+            console.error('Failed to delete conversation', err);
         }
     };
 
@@ -91,8 +108,8 @@ const AIAssistant: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen">
-            <div className="max-w-6xl mx-auto h-[80vh] flex gap-6">
+        <div className="h-screen overflow-hidden">
+            <div className="max-w-6xl mx-auto flex gap-6 p-4" style={{ height: 'calc(100vh - 80px)' }}>
 
                 {/* Sidebar */}
                 <div className="w-1/4 bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col">
@@ -109,10 +126,16 @@ const AIAssistant: React.FC = () => {
                             <div
                                 key={conv.id}
                                 onClick={() => setCurrentConversation(conv)}
-                                className={`p-3 rounded-lg cursor-pointer flex items-center space-x-3 transition ${currentConversation?.id === conv.id ? 'bg-gray-700 border-l-4 border-rose-500' : 'hover:bg-gray-700/50'}`}
+                                className={`p-3 rounded-lg cursor-pointer flex items-center space-x-3 transition group ${currentConversation?.id === conv.id ? 'bg-gray-700 border-l-4 border-rose-500' : 'hover:bg-gray-700/50'}`}
                             >
-                                <MessageSquare size={18} className="text-gray-400" />
-                                <span className="text-gray-200 truncate">{conv.title || 'Untitled Chat'}</span>
+                                <MessageSquare size={18} className="text-gray-400 shrink-0" />
+                                <span className="text-gray-200 truncate flex-1">{conv.title || 'Untitled Chat'}</span>
+                                <button
+                                    onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-rose-400 transition shrink-0"
+                                >
+                                    <X size={16} />
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -122,7 +145,7 @@ const AIAssistant: React.FC = () => {
                 <div className="flex-1 bg-gray-800 rounded-lg shadow-xl flex flex-col overflow-hidden">
                     {currentConversation ? (
                         <>
-                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6">
                                 {messages.map((msg, idx) => (
                                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`flex items-start max-w-[80%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>

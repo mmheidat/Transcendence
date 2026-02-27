@@ -76,24 +76,6 @@ class AiService {
     }
 
     async sendMessage(conversationId: number, content: string): Promise<AiMessage> {
-        // Note: The legacy service didn't explicitly show a send message endpoint detached from WebSocket, 
-        // but typically AI chats might use REST or WS. 
-        // The legacy `AiService` didn't have a `sendMessage` method? 
-        // Let's re-read legacy. 
-        // Actually, `AiService` in legacy file *only* had CRUD for conversations. 
-        // It's likely the actual chat happens via WebSocket or a specific endpoint not shown in that file, 
-        // OR I missed it. 
-        // Re-checking legacy `AiService.ts`... it returns messages in `getConversation`.
-        // But how do we send? 
-        // Ah, often AI chat is done via the same WebSocket as general chat OR a specific endpoint. 
-        // Let's assume there is a POST /messages endpoint or similar.
-        // Wait, the legacy file *doesn't* have sendMessage. 
-        // Let's assume we use the WebSocket for this, or maybe it was `SocialService` that handled it?
-        // No, `SocialService` handles user-to-user.
-
-        // I will implement a standard REST endpoint for now: POST /conversations/:id/messages
-        // If that fails 404, we'll know.
-
         const response = await fetch(`${AI_API_URL}/conversations/${conversationId}/messages`, {
             method: 'POST',
             headers: this.getHeaders(),
@@ -101,15 +83,10 @@ class AiService {
         });
 
         if (!response.ok) {
-            // Fallback: maybe it's just POST to the conversation URL or something?
-            // Let's try sending via WS if this fails? No, let's look for a specialized tool.
             throw new Error('Failed to send message to AI');
         }
 
         const data = await response.json();
-        // Expecting the *assistant's* response or the *user's* message? 
-        // Usually it returns the user message, then streams the response, or returns both.
-        // Adapting to common patterns.
         return {
             id: data.id,
             conversationId: conversationId,
@@ -117,6 +94,14 @@ class AiService {
             content: data.content,
             createdAt: data.created_at
         };
+    }
+
+    async deleteConversation(id: number): Promise<void> {
+        const response = await fetch(`${AI_API_URL}/conversations/${id}`, {
+            method: 'DELETE',
+            headers: this.getHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to delete conversation');
     }
 }
 

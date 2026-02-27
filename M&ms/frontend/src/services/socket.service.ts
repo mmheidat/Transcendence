@@ -30,7 +30,6 @@ class WebSocketClient extends EventEmitter {
         this.ws = new WebSocket(url);
 
         this.ws.onopen = () => {
-            // console.log('WS Connected');
             this.reconnectAttempts = 0;
             this.isConnecting = false;
             this.emit('connected', {});
@@ -48,7 +47,6 @@ class WebSocketClient extends EventEmitter {
         };
 
         this.ws.onclose = () => {
-            // console.log('WS Closed');
             this.isConnecting = false;
             this.emit('disconnected', {});
             this.reconnect();
@@ -70,7 +68,6 @@ class WebSocketClient extends EventEmitter {
 
     disconnect() {
         if (this.ws) {
-            // console.log('Disconnecting WebSocket...');
             this.ws.onclose = null; // Prevent reconnection logic from firing
             this.ws.close();
             this.ws = null;

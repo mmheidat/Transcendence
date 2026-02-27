@@ -22,7 +22,6 @@ const InviteHandler: React.FC = () => {
         }
 
         const handleInvite = (payload: any) => {
-            // console.log("Invite received:", payload);
             // Payload might vary, adjusting to likely structure
             // Legacy: { type: 'game_invite', invite: { id, from_user_id, from_username ... } }
             // OR { type: 'game_invite', id, from_user_id, from_username }
@@ -34,7 +33,6 @@ const InviteHandler: React.FC = () => {
         };
 
         const handleInviteAccepted = (payload: any) => {
-            // console.log("Invite accepted, starting game:", payload);
             // Payload: { type: 'game_invite_accepted', game_id: 123, is_host: boolean, opponent_id: ..., player1_name: ..., player2_name: ... }
             const { game_id, is_host, player1_name, player2_name } = payload;
 

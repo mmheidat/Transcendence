@@ -32,6 +32,7 @@ const Chat: React.FC = () => {
     const [messages, setMessages] = useState<UIMessage[]>([]);
     const [sendingRequestTo, setSendingRequestTo] = useState<number | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     // UI State for menus and modals
     const [activeMenuFriendId, setActiveMenuFriendId] = useState<number | null>(null);
@@ -100,7 +101,6 @@ const Chat: React.FC = () => {
         loadData();
 
         const handleConnected = () => {
-            // console.log('Chat connected to WS');
         };
 
         // @ts-ignore
@@ -242,7 +242,9 @@ const Chat: React.FC = () => {
     };
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messages.length > 0 && messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [messages]);
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -323,11 +325,11 @@ const Chat: React.FC = () => {
 
 
     return (
-        <div className="min-h-screen">
-            <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-white mb-6">Chat & Friends</h2>
+        <div className="h-screen overflow-hidden">
+            <div className="max-w-6xl mx-auto p-4" style={{ height: 'calc(100vh - 80px)' }}>
+                <h2 className="text-3xl font-bold text-white mb-4">Chat & Friends</h2>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ height: 'calc(100% - 52px)' }}>
                     {/* Friends List Sidebar */}
                     <div className="lg:col-span-1 flex flex-col space-y-6 h-full">
 
@@ -544,7 +546,7 @@ const Chat: React.FC = () => {
                                 </div>
 
                                 {/* Chat Messages */}
-                                <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-900/30">
+                                <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-900/30">
                                     {messages.map(msg => (
                                         <div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
                                             <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${msg.isMe ? 'bg-rose-600 text-white rounded-tr-none' : 'bg-gray-700 text-gray-200 rounded-tl-none'}`}>

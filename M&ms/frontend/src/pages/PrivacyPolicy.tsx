@@ -154,7 +154,7 @@ const PrivacyPolicy: React.FC = () => {
                         <p>We do not sell your personal information. We may share data with:</p>
                         <ul className="list-disc pl-6 mt-2 space-y-2">
                             <li><strong>Google OAuth:</strong> For authentication services (governed by Google's privacy policy)</li>
-                            <li><strong>Gemini AI:</strong> For AI assistant functionality (chat content only)</li>
+                            <li><strong>Groq AI:</strong> For AI assistant functionality (chat content only)</li>
                             <li><strong>Service Providers:</strong> Infrastructure providers that help us deliver our services</li>
                             <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
                         </ul>

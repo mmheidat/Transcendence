@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import prisma from '../lib/prisma.js';
 import { authenticate, JwtPayload } from '../lib/jwt.js';
+import { generateContentStream } from '../lib/groq.js';
 
 const aiRoutes: FastifyPluginAsync = async (fastify) => {
     // Get user's conversations
@@ -87,6 +88,87 @@ const aiRoutes: FastifyPluginAsync = async (fastify) => {
             title: conversation.title,
             created_at: conversation.createdAt,
             updated_at: conversation.updatedAt
+        });
+    });
+
+    // Send message to AI and get response
+    fastify.post('/ai/conversations/:id/messages', { preHandler: [authenticate] }, async (request, reply) => {
+        const user = request.user as JwtPayload;
+        const { id } = request.params as { id: string };
+        const { content } = request.body as { content: string };
+        const conversationId = parseInt(id);
+
+        if (!content || typeof content !== 'string') {
+            return reply.code(400).send({ error: 'Content is required' });
+        }
+
+        // Verify conversation exists and belongs to user
+        const conversation = await prisma.aiConversation.findUnique({
+            where: { id: conversationId },
+            include: {
+                messages: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 10
+                }
+            }
+        });
+
+        if (!conversation) {
+            return reply.code(404).send({ error: 'Conversation not found' });
+        }
+
+        if (conversation.userId !== user.id) {
+            return reply.code(403).send({ error: 'Access denied' });
+        }
+
+        // Save user message
+        await prisma.aiMessage.create({
+            data: {
+                conversationId,
+                role: 'user',
+                content
+            }
+        });
+
+        // Build conversation history for context
+        const history = conversation.messages.reverse().map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+
+        // Generate AI response using LangChain + Groq
+        let fullResponse = '';
+        try {
+            for await (const chunk of generateContentStream(content, history)) {
+                if (!chunk.done && chunk.text) {
+                    fullResponse += chunk.text;
+                }
+            }
+        } catch (error: any) {
+            console.error('AI generation error:', error);
+            return reply.code(500).send({ error: 'Failed to generate AI response' });
+        }
+
+        // Save assistant message
+        const assistantMessage = await prisma.aiMessage.create({
+            data: {
+                conversationId,
+                role: 'assistant',
+                content: fullResponse
+            }
+        });
+
+        // Update conversation timestamp
+        await prisma.aiConversation.update({
+            where: { id: conversationId },
+            data: { updatedAt: new Date() }
+        });
+
+        return reply.send({
+            id: assistantMessage.id,
+            role: 'assistant',
+            content: assistantMessage.content,
+            created_at: assistantMessage.createdAt
         });
     });
 
